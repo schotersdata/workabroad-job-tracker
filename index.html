@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Tracker — Work Abroad Schoters</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.29.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;background:#f5f5f3;color:#1a1a18}
+:root{
+  --blue:#378ADD;--blue-bg:#E6F1FB;--blue-dk:#0C447C;
+  --green:#639922;--green-bg:#EAF3DE;
+  --teal:#0F6E56;--teal-bg:#E1F5EE;
+  --amber:#BA7517;--amber-bg:#FAEEDA;
+  --red:#A32D2D;--red-bg:#FCEBEB;
+  --gray:#5F5E5A;--gray-bg:#F1EFE8;
+  --purple:#534AB7;--purple-bg:#EEEDFE;
+  --coral:#993C1D;--coral-bg:#FAECE7;
+  --border:#e8e6e0;--border2:#d3d1c7;
+  --bg:#f5f5f3;--bg2:#fff;--bg3:#f8f8f6;
+  --text:#1a1a18;--text2:#5f5e5a;--text3:#8c8b87;
+  --r:8px;--rl:12px;
+}
+
+/* LOGIN */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg)}
+.login-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--rl);padding:40px;width:360px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.06)}
+.login-icon{width:52px;height:52px;background:var(--blue);border-radius:var(--r);margin:0 auto 18px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px}
+.login-title{font-size:19px;font-weight:600;margin-bottom:4px}
+.login-sub{font-size:13px;color:var(--text3);margin-bottom:26px}
+.login-err{color:var(--red);font-size:12px;margin-bottom:10px;display:none;align-items:center;gap:5px;justify-content:center}
+.login-input{width:100%;padding:10px 14px;border:0.5px solid var(--border2);border-radius:var(--r);font-size:14px;font-family:inherit;outline:none;margin-bottom:12px;background:var(--bg3);color:var(--text);transition:.15s}
+.login-input:focus{border-color:var(--blue);background:#fff}
+.login-btn{width:100%;padding:11px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s}
+.login-btn:hover{opacity:.9}
+.login-note{font-size:11px;color:var(--text3);margin-top:16px}
+
+/* LAYOUT */
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:220px;min-width:220px;background:var(--bg2);border-right:0.5px solid var(--border);display:flex;flex-direction:column}
+.sb-header{padding:18px 16px;border-bottom:0.5px solid var(--border)}
+.sb-brand{font-size:14px;font-weight:600;display:flex;align-items:center;gap:7px}
+.sb-brand i{color:var(--blue);font-size:18px}
+.sb-sub{font-size:11px;color:var(--text3);margin-top:3px}
+.nav-sect{font-size:10px;font-weight:600;color:var(--text3);padding:14px 16px 4px;text-transform:uppercase;letter-spacing:.08em}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 16px;cursor:pointer;font-size:13px;color:var(--text2);transition:.12s}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--blue-bg);color:var(--blue-dk);font-weight:500}
+.nav-item i{font-size:17px}
+.sb-footer{margin-top:auto;padding:14px 16px;border-top:0.5px solid var(--border)}
+.logout{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text3);cursor:pointer}
+.logout:hover{color:var(--red)}
+
+/* MAIN */
+.main{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.topbar{background:var(--bg2);border-bottom:0.5px solid var(--border);padding:11px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.topbar-l{display:flex;align-items:center;gap:10px}
+.page-title{font-size:15px;font-weight:600}
+.topbar-r{display:flex;align-items:center;gap:8px}
+.search-box{display:flex;align-items:center;gap:6px;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--r);padding:7px 11px;width:220px}
+.search-box i{font-size:15px;color:var(--text3)}
+.search-box input{background:none;border:none;outline:none;font-size:13px;color:var(--text);font-family:inherit;width:100%}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 12px;border-radius:var(--r);font-size:13px;font-weight:500;cursor:pointer;border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-family:inherit;transition:.12s}
+.btn:hover{background:var(--bg3)}
+.btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn.primary:hover{opacity:.9}
+.btn.sm{padding:5px 10px;font-size:12px}
+.btn.danger{background:var(--red-bg);color:var(--red);border-color:var(--red)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* CONTENT */
+.content{flex:1;overflow-y:auto;padding:20px}
+.page{display:none}
+.page.active{display:block}
+
+/* METRICS */
+.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px}
+.metric{background:var(--bg3);border-radius:var(--r);padding:14px;cursor:pointer;transition:.12s;border:0.5px solid transparent}
+.metric:hover{border-color:var(--border2)}
+.metric.sel{border-color:var(--blue);background:var(--blue-bg)}
+.metric-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.metric-val{font-size:22px;font-weight:600;color:var(--text)}
+.metric-sub{font-size:11px;color:var(--text3);margin-top:2px}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500;white-space:nowrap}
+.b-SUB{background:var(--gray-bg);color:var(--gray)}
+.b-ADV_DOC{background:var(--blue-bg);color:var(--blue-dk)}
+.b-ADV_PAR{background:var(--purple-bg);color:var(--purple)}
+.b-ADV_USR{background:var(--teal-bg);color:var(--teal)}
+.b-OFF{background:var(--amber-bg);color:var(--amber)}
+.b-ACC{background:var(--green-bg);color:var(--green)}
+.b-REJ{background:var(--red-bg);color:var(--red)}
+.b-null{background:var(--bg3);color:var(--text3)}
+
+/* FILTERS */
+.filter-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.chip{padding:5px 12px;border-radius:20px;font-size:12px;cursor:pointer;border:0.5px solid var(--border2);background:var(--bg2);color:var(--text2);transition:.12s;font-family:inherit}
+.chip:hover{background:var(--bg3)}
+.chip.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+/* TABLE */
+.card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--rl);overflow:hidden}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{text-align:left;padding:10px 14px;font-size:11px;font-weight:600;color:var(--text3);border-bottom:0.5px solid var(--border);background:var(--bg3);text-transform:uppercase;letter-spacing:.04em}
+.tbl td{padding:11px 14px;border-bottom:0.5px solid var(--border);color:var(--text);vertical-align:middle;font-size:13px}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tbody tr{cursor:pointer;transition:.1s}
+.tbl tbody tr:hover td{background:var(--blue-bg)}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--blue-bg);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--blue-dk);flex-shrink:0;overflow:hidden}
+.avatar img{width:32px;height:32px;border-radius:50%;object-fit:cover}
+.name-cell{display:flex;align-items:center;gap:10px}
+
+/* PIPELINE */
+.pipeline{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px;min-height:500px;align-items:flex-start}
+.pip-col{min-width:155px;flex:1;max-width:200px}
+.pip-head{padding:8px 12px;border-radius:var(--r);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:600}
+.pip-body{display:flex;flex-direction:column;gap:7px;min-height:60px}
+.pip-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:10px;cursor:pointer;transition:.12s}
+.pip-card:hover{border-color:var(--blue)}
+.pip-card .pc-name{font-size:12px;font-weight:500;margin-bottom:2px}
+.pip-card .pc-prog{font-size:11px;color:var(--text3)}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.38);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.modal{background:var(--bg2);border-radius:var(--rl);width:100%;max-width:680px;max-height:90vh;overflow-y:auto;padding:24px}
+.modal-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:12px}
+.modal-close{background:none;border:none;cursor:pointer;color:var(--text3);font-size:20px;padding:0;line-height:1;flex-shrink:0}
+.modal-close:hover{color:var(--text)}
+.modal-av{width:56px;height:56px;border-radius:50%;background:var(--blue-bg);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600;color:var(--blue-dk);flex-shrink:0;overflow:hidden}
+.modal-av img{width:100%;height:100%;object-fit:cover}
+.modal-name{font-size:16px;font-weight:600;margin-bottom:3px}
+.modal-meta{font-size:12px;color:var(--text3)}
+.field-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border);font-size:13px}
+.field-row:last-child{border-bottom:none}
+.field-lbl{width:110px;color:var(--text3);flex-shrink:0;padding-top:1px}
+.field-val{flex:1;color:var(--text);font-weight:500;word-break:break-word}
+.doc-list{display:flex;flex-direction:column;gap:6px}
+.doc-item{display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg3);border-radius:var(--r);font-size:12px;border:0.5px solid var(--border)}
+.doc-item i{color:var(--text3);font-size:16px;flex-shrink:0}
+.doc-item a{color:var(--blue);text-decoration:none;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.doc-item a:hover{text-decoration:underline}
+.status-section{margin-top:16px;padding-top:16px;border-top:0.5px solid var(--border)}
+.status-lbl{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px}
+.status-grid{display:flex;flex-wrap:wrap;gap:7px}
+.s-opt{padding:6px 13px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1.5px solid transparent;transition:.12s;font-family:inherit}
+.s-opt:hover{opacity:.85}
+.s-opt.sel{border-width:2px;font-weight:600}
+
+/* SETTINGS */
+.settings-sect{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--rl);padding:20px;margin-bottom:14px}
+.settings-title{font-size:13px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;color:var(--text)}
+.settings-title i{color:var(--blue)}
+.form-group{margin-bottom:12px}
+.form-lbl{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:5px;display:block}
+.form-inp{width:100%;padding:8px 12px;border:0.5px solid var(--border2);border-radius:var(--r);font-size:13px;font-family:inherit;outline:none;background:var(--bg3);color:var(--text);transition:.15s}
+.form-inp:focus{border-color:var(--blue);background:#fff}
+.form-note{font-size:11px;color:var(--text3);margin-top:4px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* UTILS */
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px;color:var(--text3);gap:12px}
+.spinner{width:28px;height:28px;border:2.5px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px;color:var(--text3);gap:8px;font-size:13px;text-align:center}
+.empty i{font-size:40px;color:var(--border2)}
+.no-cfg{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px;text-align:center;gap:12px}
+.no-cfg i{font-size:48px;color:var(--border2)}
+.no-cfg h3{font-size:16px;font-weight:600}
+.no-cfg p{font-size:13px;color:var(--text3);max-width:300px;line-height:1.6}
+.toast{position:fixed;bottom:24px;right:24px;background:#1a1a18;color:#fff;padding:12px 18px;border-radius:var(--r);font-size:13px;z-index:2000;animation:fadeup .2s ease;display:flex;align-items:center;gap:8px;max-width:320px}
+.toast.ok i{color:#7cd267}
+.toast.err i{color:#f09595}
+@keyframes fadeup{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.prog-bars{display:flex;flex-direction:column;gap:9px}
+.prog-row{display:flex;align-items:center;gap:10px;font-size:12px}
+.prog-nm{width:92px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prog-track{flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;transition:width .5s}
+.prog-n{width:22px;text-align:right;font-weight:500}
+.sect-title{font-size:13px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.pill-prog{padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500}
+.p-WABlueCollar{background:var(--blue-bg);color:var(--blue-dk)}
+.p-WAWhiteCollar{background:var(--purple-bg);color:var(--purple)}
+.p-Ausbildung{background:var(--coral-bg);color:var(--coral)}
+.p-TokuteiGinou{background:var(--teal-bg);color:var(--teal)}
+
+/* DOC CARDS */
+.sect-hdr{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin:16px 0 8px;padding-bottom:6px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.sect-hdr span{font-weight:400;font-size:11px;color:var(--text3)}
+.doc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-top:4px}
+.doc-card{border:0.5px solid var(--border);border-radius:var(--r);padding:9px 10px;display:flex;align-items:center;gap:8px;font-size:12px;text-decoration:none;transition:.12s}
+.doc-card.has{border-color:var(--teal);background:var(--teal-bg);color:var(--teal-dk, #04342C)}
+.doc-card.no{background:var(--bg3);color:var(--text3)}
+.doc-card .dc-i{font-size:17px;flex-shrink:0}
+.doc-card .dc-n{flex:1;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}
+.doc-card .dc-s{font-size:14px;flex-shrink:0}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:4px}
+.info-item{background:var(--bg3);border-radius:var(--r);padding:9px 10px;border:0.5px solid var(--border)}
+.info-item .ii-lbl{font-size:10px;color:var(--text3);margin-bottom:3px;text-transform:uppercase;letter-spacing:.05em}
+.info-item .ii-val{font-size:12px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cred-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:4px}
+.cred-item{background:var(--amber-bg);border:0.5px solid var(--amber);border-radius:var(--r);padding:9px 10px}
+.cred-lbl{font-size:10px;color:var(--amber);margin-bottom:3px;text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+.cred-val{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px;word-break:break-all}
+.eye-btn{background:none;border:none;cursor:pointer;color:var(--text3);padding:0;font-size:15px;flex-shrink:0}
+.eye-btn:hover{color:var(--text)}
+
+/* STUDENT VIEW / FILTERS */
+.filter-bar2{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+.filter-sel{padding:6px 10px;border-radius:var(--r);font-size:12px;border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);font-family:inherit;cursor:pointer;outline:none;max-width:160px}
+.filter-sel:focus{border-color:var(--blue)}
+.filter-sel.active{border-color:var(--blue);background:var(--blue-bg);color:var(--blue-dk)}
+.view-toggle{display:flex;gap:2px;background:var(--bg3);padding:3px;border-radius:var(--r);border:0.5px solid var(--border);margin-left:auto}
+.vt-btn{padding:5px 11px;border-radius:6px;font-size:12px;border:none;background:none;cursor:pointer;color:var(--text2);font-family:inherit;display:flex;align-items:center;gap:5px}
+.vt-btn.active{background:var(--bg2);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.08);font-weight:500}
+.count-badge{background:var(--blue-bg);color:var(--blue-dk);font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap}
+/* STUDENT PROFILE MODAL */
+.sp-apps{display:flex;flex-direction:column;gap:0}
+.sp-app-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:0.5px solid var(--border);cursor:pointer;transition:.1s;font-size:13px}
+.sp-app-row:hover{background:var(--blue-bg)}
+.sp-app-row:last-child{border-bottom:none}
+.sp-app-num{width:22px;height:22px;border-radius:50%;background:var(--bg3);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0}
+.doc-sum-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-top:6px}
+.doc-sum-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--r);font-size:12px;border:0.5px solid var(--border)}
+.doc-sum-item.has{background:var(--teal-bg);border-color:var(--teal);color:#04342C}
+.doc-sum-item.no{background:var(--bg3);color:var(--text3)}
+.doc-sum-item i{font-size:15px;flex-shrink:0}
+.doc-sum-item a{color:inherit;text-decoration:none;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.doc-sum-item span{font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-icon"><i class="ti ti-briefcase"></i></div>
+      <div class="login-title">Job Tracker</div>
+      <div class="login-sub">Work Abroad Schoters</div>
+      <div class="login-err" id="login-err"><i class="ti ti-alert-circle"></i> Password salah, coba lagi.</div>
+      <input type="password" class="login-input" id="pass-inp" placeholder="Masukkan password..." onkeydown="if(event.key==='Enter')tryLogin()">
+      <button class="login-btn" onclick="tryLogin()">Masuk</button>
+      <div class="login-note">Default password: <strong>workabroad2026</strong><br>Bisa diubah di Pengaturan.</div>
+    </div>
+  </div>
+</div>
+
+<!-- APP SCREEN -->
+<div id="app-screen" style="display:none" class="app">
+  <aside class="sidebar">
+    <div class="sb-header">
+      <div class="sb-brand"><i class="ti ti-briefcase"></i> Job Tracker</div>
+      <div class="sb-sub">Work Abroad Schoters</div>
+    </div>
+
+    <div class="nav-sect">Menu</div>
+    <div class="nav-item active" data-page="dashboard" onclick="showPage('dashboard',this)"><i class="ti ti-layout-dashboard"></i>Dashboard</div>
+    <div class="nav-item" data-page="students" onclick="showPage('students',this)"><i class="ti ti-users"></i>Students</div>
+
+    <div class="nav-sect">Program</div>
+    <div class="nav-item" onclick="filterByProgram('all',this)"><i class="ti ti-world"></i>Semua Program</div>
+    <div class="nav-item" onclick="filterByProgram('WA Blue Collar',this)"><i class="ti ti-flag"></i>WA Blue Collar</div>
+    <div class="nav-item" onclick="filterByProgram('WA White Collar',this)"><i class="ti ti-flag"></i>WA White Collar</div>
+    <div class="nav-item" onclick="filterByProgram('Tokutei Ginou',this)"><i class="ti ti-flag"></i>Tokutei Ginou</div>
+    <div class="nav-item" onclick="filterByProgram('Ausbildung',this)"><i class="ti ti-flag"></i>Ausbildung</div>
+
+    <div class="nav-sect">Lainnya</div>
+    <div class="nav-item" data-page="settings" onclick="showPage('settings',this)"><i class="ti ti-settings"></i>Pengaturan</div>
+
+    <div class="sb-footer">
+      <div class="logout" onclick="logout()"><i class="ti ti-logout"></i> Keluar</div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-l">
+        <div class="page-title" id="pg-title">Dashboard</div>
+        <button class="btn sm" id="refresh-btn" onclick="loadData()"><i class="ti ti-refresh"></i> Refresh</button>
+      </div>
+      <div class="topbar-r">
+        <div class="search-box"><i class="ti ti-search"></i><input type="text" placeholder="Cari nama / email..." oninput="setSearch(this.value)"></div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="page active" id="page-dashboard"><div id="dash-inner"></div></div>
+      <div class="page" id="page-students">
+        <div class="filter-row" id="status-chips"></div>
+        <div id="students-wrap"></div>
+      </div>
+      <div class="page" id="page-settings"><div id="settings-inner"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="modal-overlay" style="display:none" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<script>
+// ========== CONSTANTS ==========
+const BASES = {
+  English:       { id: 'appoL1kdbV0UyLwL4' },
+  Ausbildung:    { id: 'appNCTwB49kyXbR1V' },
+  'Tokutei Ginou': { id: 'app81I9rWfsU9PjVv' },
+};
+
+// Program tampilan (bisa beda dari base — English base dipecah jadi 2 program)
+const PROGRAM_META = {
+  'WA Blue Collar':  { baseKey: 'English',        color: '#378ADD', bg: '#E6F1FB', dk: '#0C447C' },
+  'WA White Collar': { baseKey: 'English',        color: '#534AB7', bg: '#EEEDFE', dk: '#26215C' },
+  'Ausbildung':      { baseKey: 'Ausbildung',     color: '#993C1D', bg: '#FAECE7', dk: '#712B13' },
+  'Tokutei Ginou':   { baseKey: 'Tokutei Ginou',  color: '#0F6E56', bg: '#E1F5EE', dk: '#04342C' },
+};
+const PROGRAM_KEYS = Object.keys(PROGRAM_META);
+
+function progSlug(p) { return String(p).replace(/[^a-zA-Z0-9]/g, ''); }
+
+// Tentukan program tampilan dari record mentah Airtable berdasarkan field "Program"
+function resolveProgram(baseKey, rawRecord) {
+  if (baseKey === 'English') {
+    const val = (rawRecord.fields['Program'] || '').toString().toLowerCase();
+    if (val.includes('white')) return 'WA White Collar';
+    return 'WA Blue Collar';
+  }
+  return baseKey;
+}
+
+const STATUS = {
+  SUB:     { label: 'Submitted',    bg: '#F1EFE8', color: '#5F5E5A', dk: '#2C2C2A' },
+  ADV_DOC: { label: 'Adv. Dokumen', bg: '#E6F1FB', color: '#378ADD', dk: '#0C447C' },
+  ADV_PAR: { label: 'Adv. Partner', bg: '#EEEDFE', color: '#534AB7', dk: '#26215C' },
+  ADV_USR: { label: 'Adv. User',    bg: '#E1F5EE', color: '#0F6E56', dk: '#04342C' },
+  OFF:     { label: 'Offer',        bg: '#FAEEDA', color: '#BA7517', dk: '#412402' },
+  ACC:     { label: 'Accepted',     bg: '#EAF3DE', color: '#639922', dk: '#173404' },
+  REJ:     { label: 'Rejected',     bg: '#FCEBEB', color: '#A32D2D', dk: '#501313' },
+};
+const STATUS_KEYS = Object.keys(STATUS);
+
+
+// ========== PROGRAM FIELD CONFIG ==========
+const PROG_CONFIG = {
+  'WA Blue Collar': {
+    mitra:   '[31] List Mitra (from Job ID (Sync))',
+    company: 'Company Name (from Job ID (Sync))',
+    jobRole: 'Job Role (from Job ID (Sync))', jobSource: 'Job Source (from Job ID (Sync))', country: 'Country',
+    prevStatus: 'Prev Status ID', needProcess: 'Need Process',
+    konfirmasi: 'Konfirmasi Pendaftaran',
+    docs: [
+      { label: 'CV', field: 'CV (PDF)', icon: 'ti-file-text' },
+      { label: 'Paspor', field: 'Paspor', icon: 'ti-file-text' },
+      { label: 'Sertifikat Bhs Inggris', field: 'Sertifikat Bahasa Inggris (PDF)', icon: 'ti-certificate' },
+      { label: 'Recommendation Letter', field: 'Recommendation Letter (PDF)', icon: 'ti-file-text' },
+      { label: 'Motivation Letter', field: 'Motivation Letter (PDF)', icon: 'ti-file-text' },
+      { label: 'Study Plan', field: 'Study Plan (PDF)', icon: 'ti-file-text' },
+      { label: 'Research Plan', field: 'Research Plan (PDF)', icon: 'ti-file-text' },
+      { label: 'Ijazah Terakhir', field: 'Ijazah Pendidikan Terakhir (PDF)', icon: 'ti-school' },
+      { label: 'Transkrip Nilai', field: 'Transkrip Nilai Pendidikan Terakhir (PDF)', icon: 'ti-clipboard-list' },
+      { label: 'Language Proficiency', field: 'Language Proficiency Test (IELTS, TOEFL iBT, TOPIK, JLPT, etc)', icon: 'ti-language' },
+    ],
+    urls: [{ label: 'LinkedIn', field: 'Link Linkedin', icon: 'ti-brand-linkedin' }],
+    special: []
+  },
+  'WA White Collar': {
+    mitra:   '[31] List Mitra (from Job ID (Sync))',
+    company: 'Company Name (from Job ID (Sync))',
+    jobRole: 'Job Role (from Job ID (Sync))', jobSource: 'Job Source (from Job ID (Sync))', country: 'Country',
+    prevStatus: 'Prev Status ID', needProcess: 'Need Process',
+    konfirmasi: 'Konfirmasi Pendaftaran',
+    docs: [
+      { label: 'CV', field: 'CV (PDF)', icon: 'ti-file-text' },
+      { label: 'Paspor', field: 'Paspor', icon: 'ti-file-text' },
+      { label: 'Sertifikat Bhs Inggris', field: 'Sertifikat Bahasa Inggris (PDF)', icon: 'ti-certificate' },
+      { label: 'Recommendation Letter', field: 'Recommendation Letter (PDF)', icon: 'ti-file-text' },
+      { label: 'Motivation Letter', field: 'Motivation Letter (PDF)', icon: 'ti-file-text' },
+      { label: 'Study Plan', field: 'Study Plan (PDF)', icon: 'ti-file-text' },
+      { label: 'Research Plan', field: 'Research Plan (PDF)', icon: 'ti-file-text' },
+      { label: 'Ijazah Terakhir', field: 'Ijazah Pendidikan Terakhir (PDF)', icon: 'ti-school' },
+      { label: 'Transkrip Nilai', field: 'Transkrip Nilai Pendidikan Terakhir (PDF)', icon: 'ti-clipboard-list' },
+      { label: 'Language Proficiency', field: 'Language Proficiency Test (IELTS, TOEFL iBT, TOPIK, JLPT, etc)', icon: 'ti-language' },
+    ],
+    urls: [{ label: 'LinkedIn', field: 'Link Linkedin', icon: 'ti-brand-linkedin' }],
+    special: []
+  },
+  Ausbildung: {
+    mitra:   '[31] List Mitra (from Job ID (Sync))',
+    company: 'Company Name (from Job ID (Sync))',
+    jobRole: 'Job Role (from Job ID (Sync))', jobSource: 'Job Source (from Job ID (Sync))', country: 'Country',
+    prevStatus: 'Prev Status ID', needProcess: 'Need Process',
+    konfirmasi: 'Konfirmasi Pendaftaran',
+    docs: [
+      { label: 'CV', field: 'CV (PDF)', icon: 'ti-file-text' },
+      { label: 'Paspor', field: 'Paspor', icon: 'ti-file-text' },
+      { label: 'Sertifikat Bhs Jerman', field: 'Sertifikat Bahasa Jerman (PDF)', icon: 'ti-certificate' },
+      { label: 'Sertifikat Keahlian', field: 'Sertifikat Keahlian (PDF)', icon: 'ti-award' },
+      { label: 'Motivation Letter', field: 'Motivation Letter (PDF)', icon: 'ti-file-text' },
+      { label: 'Video Perkenalan', field: 'Video Perkenalan (Mp4)', icon: 'ti-video' },
+      { label: 'Tanda Tangan', field: 'Tanda Tangan (JPG/PNG)', icon: 'ti-signature' },
+      { label: 'KTP', field: 'KTP (JPG/PNG)', icon: 'ti-id' },
+      { label: 'KK', field: 'KK (JPG/PNG)', icon: 'ti-users' },
+      { label: 'Dokumen Apostille', field: 'Dokumen Apostille (Akta Lahir & Ijazah)', icon: 'ti-file-certificate' },
+      { label: 'Terjemahan Tersumpah', field: 'Terjemahan Tersumpah Akta Lahir & Ijazah', icon: 'ti-file-text' },
+    ],
+    urls: [],
+    special: []
+  },
+  'Tokutei Ginou': {
+    mitra:   '[31] List Mitra (from Job ID (Sync))',
+    company: 'Company Name (from Job ID (Sync))',
+    jobRole: 'Job Role (from Job ID (Sync))', jobSource: 'Job Source (from Job ID (Sync))', country: 'Country',
+    prevStatus: 'Prev Status ID', needProcess: 'Need Process',
+    konfirmasi: 'Konfirmasi Pendaftaran',
+    docs: [
+      { label: 'CV', field: 'CV (PDF)', icon: 'ti-file-text' },
+      { label: 'Paspor', field: 'Paspor', icon: 'ti-file-text' },
+      { label: 'KTP', field: 'KTP (JPG/PNG)', icon: 'ti-id' },
+      { label: 'Ijazah SMA/SMK', field: 'Ijazah SMA/SMK (PDF)', icon: 'ti-school' },
+      { label: 'Pas Foto Resmi', field: 'Pas Foto Resmi (JPG/PNG)', icon: 'ti-user-circle' },
+      { label: 'Akta Lahir', field: 'Akta Lahir (PDF)', icon: 'ti-file-text' },
+      { label: 'Sertifikat JLPT/JFT', field: 'Sertifikat Bahasa JLPT/JFT (PDF)', icon: 'ti-certificate' },
+      { label: 'Sertifikat SSW', field: 'Sertifikat SSW (PDF)', icon: 'ti-award' },
+    ],
+    urls: [{ label: 'LinkedIn', field: 'Link LinkedIn', icon: 'ti-brand-linkedin' }],
+    special: [
+      { label: 'Username JLPT', field: 'Username JLPT', isPass: false },
+      { label: 'Password JLPT', field: 'Password JLPT', isPass: true },
+      { label: 'Username JFT',  field: 'Username JFT',  isPass: false },
+      { label: 'Password JFT',  field: 'Password JFT',  isPass: true },
+    ]
+  }
+};
+
+// ========== KONFIGURASI DEFAULT (sudah di-embed, tidak perlu setting manual lagi) ==========
+// PENTING: isi apiToken di bawah ini SEKALI sebelum upload ke GitHub/Netlify.
+// Siapapun yang punya link bisa lihat token ini lewat "View Page Source",
+// jadi pastikan token hanya punya scope read+write ke 3 base ini saja.
+const DEFAULT_CFG = {
+  apiToken: 'patqCSQPzGMTjvM1C.1cfa3445d71487b98312ec3162b575605c004cce3ea5a859a7ded7ac95d2c575',
+  password: 'workabroad2026',
+  tblEnglish: 'Job Apply',
+  tblAusbildung: 'Job Apply',
+  tblTokutei: 'Job Apply',
+  sheetsUrl: 'https://script.google.com/macros/s/AKfycbx6f1FRc1d6-5ueUXEiVXN_jfvNH6UulVOFbzv61oriay_bAnw0IIMK7i7tQbaQnWFp/exec',
+  changedBy: 'workabroadacademy@schoters.com',
+};
+
+// ========== STATE ==========
+let cfg = {};
+let students = [];
+let progFilter = 'all';
+let statusFilter = 'all';
+let search = '';
+let saving = false;
+let filterJobRole = 'all';
+let filterJobSource = 'all';
+let filterMitra = 'all';
+let viewMode = 'list'; // 'list' or 'student'
+
+// ========== CONFIG ==========
+function loadCfg() {
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem('jt_cfg') || '{}'); } catch { saved = {}; }
+  cfg = { ...DEFAULT_CFG };
+  for (const k in saved) {
+    if (saved[k] !== '' && saved[k] !== null && saved[k] !== undefined) cfg[k] = saved[k];
+  }
+}
+function saveCfg() { localStorage.setItem('jt_cfg', JSON.stringify(cfg)); }
+function isConfigured() {
+  return cfg.apiToken && (cfg.tblEnglish || cfg.tblAusbildung || cfg.tblTokutei);
+}
+function fld(name) { return cfg['fld_' + name] || name; }
+
+// ========== AUTH ==========
+function tryLogin() {
+  const p = document.getElementById('pass-inp').value;
+  const stored = cfg.password || 'workabroad2026';
+  const errEl = document.getElementById('login-err');
+  if (p === stored) {
+    errEl.style.display = 'none';
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app-screen').style.display = 'flex';
+    initApp();
+  } else {
+    errEl.style.display = 'flex';
+  }
+}
+function logout() {
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = '';
+  document.getElementById('pass-inp').value = '';
+}
+
+// ========== API ==========
+async function fetchPage(baseId, table, offset) {
+  let url = `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(table)}?pageSize=100`;
+  if (offset) url += `&offset=${offset}`;
+  const r = await fetch(url, { headers: { Authorization: `Bearer ${cfg.apiToken}` } });
+  if (!r.ok) throw new Error(`${r.status} ${await r.text()}`);
+  return r.json();
+}
+async function fetchAll(baseId, table) {
+  let recs = [], offset;
+  do {
+    const d = await fetchPage(baseId, table, offset);
+    recs = recs.concat(d.records);
+    offset = d.offset;
+  } while (offset);
+  return recs;
+}
+async function patchRecord(baseId, table, id, fields) {
+  const r = await fetch(`https://api.airtable.com/v0/${baseId}/${encodeURIComponent(table)}/${id}`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${cfg.apiToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fields })
+  });
+  if (!r.ok) throw new Error(`${r.status}`);
+  return r.json();
+}
+
+// ========== DATA HELPERS ==========
+function sf(rec, key) {
+  const v = rec.fields[key];
+  if (!v) return '';
+  if (Array.isArray(v)) return v.map(x => x.name || x).filter(Boolean).join(', ');
+  return String(v);
+}
+function photoUrl(rec, key) {
+  const v = rec.fields[key];
+  if (!Array.isArray(v) || !v[0]) return null;
+  return v[0].thumbnails?.large?.url || v[0].url;
+}
+function attachments(rec, key) {
+  const v = rec.fields[key];
+  if (!Array.isArray(v)) return [];
+  return v.map(a => ({ name: a.filename, url: a.url }));
+}
+function initials(name) {
+  return (name || '?').split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase();
+}
+function avatarHtml(rec, size = 32) {
+  const fn = fld('Photo');
+  const url = photoUrl(rec, fn);
+  const name = sf(rec, fld('Name')) || '?';
+  const s = `width:${size}px;height:${size}px;border-radius:50%;background:var(--blue-bg);display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.35)}px;font-weight:600;color:var(--blue-dk);flex-shrink:0;overflow:hidden`;
+  if (url) return `<div style="${s}"><img src="${url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='${initials(name)}'"></div>`;
+  return `<div style="${s}">${initials(name)}</div>`;
+}
+function badgeHtml(status) {
+  if (!status) return `<span class="badge b-null">—</span>`;
+  const m = STATUS[status];
+  if (!m) return `<span class="badge b-null">${status}</span>`;
+  return `<span class="badge b-${status}">${m.label}</span>`;
+}
+
+// ========== LOAD DATA ==========
+async function loadData() {
+  if (!isConfigured()) { renderAll(); return; }
+  const btn = document.getElementById('refresh-btn');
+  btn.disabled = true; btn.innerHTML = '<i class="ti ti-refresh" style="animation:spin .7s linear infinite"></i> Loading...';
+  students = [];
+  const pairs = [
+    ['English',        cfg.tblEnglish],
+    ['Ausbildung',     cfg.tblAusbildung],
+    ['Tokutei Ginou',  cfg.tblTokutei],
+  ].filter(([,t]) => t);
+  const results = await Promise.allSettled(
+    pairs.map(([baseKey, tbl]) =>
+      fetchAll(BASES[baseKey].id, tbl).then(recs => recs.map(r => {
+        const prog = resolveProgram(baseKey, r);
+        return { ...r, _prog: prog, _base: BASES[baseKey].id, _tbl: tbl };
+      }))
+    )
+  );
+  let errs = [];
+  for (const r of results) {
+    if (r.status === 'fulfilled') students = students.concat(r.value);
+    else errs.push(r.reason?.message);
+  }
+  btn.disabled = false; btn.innerHTML = '<i class="ti ti-refresh"></i> Refresh';
+  if (errs.length) showToast('Error: ' + errs[0], 'err');
+  else showToast(`${students.length} student dimuat`, 'ok');
+  renderAll();
+}
+
+// ========== FILTERS ==========
+function filtered() {
+  return students.filter(s => {
+    const status    = sf(s, fld('Apply Status'));
+    const name      = sf(s, fld('Name'));
+    const email     = sf(s, fld('Email')) || sf(s, 'Final Email');
+    const jobRole   = sf(s, 'Job Role (from Job ID (Sync))');
+    const jobSource = sf(s, 'Job Source (from Job ID (Sync))');
+    const mitra     = sf(s, '[31] List Mitra (from Job ID (Sync))');
+    if (progFilter !== 'all' && s._prog !== progFilter) return false;
+    if (statusFilter !== 'all' && status !== statusFilter) return false;
+    if (filterJobRole !== 'all' && jobRole !== filterJobRole) return false;
+    if (filterJobSource !== 'all' && jobSource !== filterJobSource) return false;
+    if (filterMitra !== 'all' && mitra !== filterMitra) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      if (!name.toLowerCase().includes(q) && !email.toLowerCase().includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+function uniqueVals(fieldName) {
+  const vals = new Set();
+  students.forEach(s => { const v = sf(s, fieldName); if (v && v !== '—') vals.add(v); });
+  return [...vals].sort();
+}
+
+function getStudentGroups(list) {
+  const groups = new Map();
+  list.forEach(s => {
+    const key = sf(s, fld('Email')) || sf(s, 'Final Email') || s.id;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(s);
+  });
+  return groups;
+}
+
+function getConsolidatedDocs(records) {
+  const result = {};
+  records.forEach(s => {
+    const pc = PROG_CONFIG[s._prog];
+    if (!pc) return;
+    [...pc.docs, ...pc.urls].forEach(d => {
+      if (!result[d.label]) result[d.label] = { label: d.label, field: d.field, icon: d.icon || 'ti-file-text', found: false, url: null, isUrl: !!d.field?.match?.(/linkedin/i) };
+      if (!result[d.label].found) {
+        const files = attachments(s, d.field);
+        if (files.length) { result[d.label].found = true; result[d.label].url = files[0].url; return; }
+        const urlVal = sf(s, d.field);
+        if (urlVal && urlVal.startsWith('http')) { result[d.label].found = true; result[d.label].url = urlVal; }
+      }
+    });
+  });
+  return Object.values(result);
+}
+function setSearch(v) { search = v; renderStudents(); }
+function resetFilters() { filterJobRole='all'; filterJobSource='all'; filterMitra='all'; renderStudents(); }
+function resetBtnHtml() { return '<button class="chip" onclick="resetFilters()" style="color:var(--red);border-color:var(--red)"><i class=\"ti ti-x\"></i> Reset filter</button>'; }
+function filterByProgram(prog, el) {
+  progFilter = prog; statusFilter = 'all'; search = '';
+  document.querySelector('.search-box input').value = '';
+  showPage('students', document.querySelector('[data-page="students"]'));
+  renderStudents();
+}
+
+// ========== RENDER ALL ==========
+function renderAll() {
+  const page = document.querySelector('.page.active')?.id?.replace('page-','');
+  if (page === 'dashboard') renderDashboard();
+  else if (page === 'students') renderStudents();
+  else if (page === 'settings') renderSettings();
+}
+
+// ========== DASHBOARD ==========
+function renderDashboard() {
+  const el = document.getElementById('dash-inner');
+  if (!isConfigured()) { el.innerHTML = noCfgHtml(); return; }
+  if (!students.length) { el.innerHTML = '<div class="loading"><div class="spinner"></div><span>Memuat data...</span></div>'; return; }
+
+  const total = students.length;
+  const counts = {};
+  STATUS_KEYS.forEach(k => counts[k] = students.filter(s => sf(s, fld('Apply Status')) === k).length);
+  const progCounts = {};
+  Object.keys(PROGRAM_META).forEach(p => progCounts[p] = students.filter(s => s._prog === p).length);
+  const maxProg = Math.max(...Object.values(progCounts), 1);
+
+  el.innerHTML = `
+  <div class="metrics">
+    <div class="metric" onclick="statusFilter='all';showPage('students',document.querySelector('[data-page=students]'))">
+      <div class="metric-lbl">Total</div><div class="metric-val">${total}</div><div class="metric-sub">Semua student</div>
+    </div>
+    ${['SUB','ADV_DOC','ADV_PAR','OFF','ACC'].map(k => `
+    <div class="metric" onclick="statusFilter='${k}';showPage('students',document.querySelector('[data-page=students]'));renderStudents()">
+      <div class="metric-lbl">${STATUS[k].label}</div>
+      <div class="metric-val" style="color:${STATUS[k].color}">${counts[k]||0}</div>
+      <div class="metric-sub">${((counts[k]||0)/total*100).toFixed(0)}% dari total</div>
+    </div>`).join('')}
+  </div>
+  <div class="two-col">
+    <div class="card" style="padding:18px">
+      <div class="sect-title">Per Program</div>
+      <div class="prog-bars">
+        ${Object.entries(PROGRAM_META).map(([prog, b]) => `
+        <div class="prog-row">
+          <span class="prog-nm">${prog}</span>
+          <div class="prog-track"><div class="prog-fill" style="width:${Math.round((progCounts[prog]||0)/maxProg*100)}%;background:${b.color}"></div></div>
+          <span class="prog-n">${progCounts[prog]||0}</span>
+        </div>`).join('')}
+      </div>
+      <div style="margin-top:18px" class="sect-title">Per Status</div>
+      <div class="prog-bars">
+        ${STATUS_KEYS.map(k => `
+        <div class="prog-row">
+          <span class="prog-nm">${STATUS[k].label}</span>
+          <div class="prog-track"><div class="prog-fill" style="width:${Math.round((counts[k]||0)/total*100)}%;background:${STATUS[k].color}"></div></div>
+          <span class="prog-n">${counts[k]||0}</span>
+        </div>`).join('')}
+      </div>
+    </div>
+    <div class="card" style="padding:18px">
+      <div class="sect-title">Student Terbaru</div>
+      <div style="display:flex;flex-direction:column;gap:0">
+        ${students.slice(0,8).map(s => {
+          const name = sf(s, fld('Name')) || '—';
+          const status = sf(s, fld('Apply Status'));
+          const b = PROGRAM_META[s._prog];
+          return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--border);cursor:pointer" onclick='openModal(${JSON.stringify(s._id||s.id||"")})'>
+            ${avatarHtml(s, 28)}
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</div>
+              <div style="font-size:11px;color:var(--text3)">${s._prog}</div>
+            </div>
+            ${badgeHtml(status)}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  </div>`;
+
+  // re-bind clicks
+  students.slice(0,8).forEach((s,i) => {
+    const divs = document.getElementById('dash-inner').querySelectorAll('[onclick^="openModal"]');
+    if (divs[i]) divs[i].onclick = () => openModal(s);
+  });
+}
+
+// ========== STUDENTS TABLE ==========
+function renderStudents() {
+  const chipsEl = document.getElementById('status-chips');
+  const wrapEl  = document.getElementById('students-wrap');
+  if (!isConfigured()) { chipsEl.innerHTML=''; wrapEl.innerHTML = noCfgHtml(); return; }
+
+  // Row 1: status chips + view toggle
+  const allStatus = [{ k:'all', label:'Semua' }, ...STATUS_KEYS.map(k => ({ k, label: STATUS[k].label }))];
+  chipsEl.innerHTML = `
+    <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;width:100%">
+      <div style="display:flex;gap:7px;flex-wrap:wrap;flex:1">
+        ${allStatus.map(({ k, label }) =>
+          `<button class="chip ${statusFilter===k?'active':''}" onclick="statusFilter='${k}';renderStudents()">${label}</button>`
+        ).join('')}
+      </div>
+      <div class="view-toggle">
+        <button class="vt-btn ${viewMode==='list'?'active':''}" onclick="viewMode='list';renderStudents()">
+          <i class="ti ti-list"></i> Per Apply
+        </button>
+        <button class="vt-btn ${viewMode==='student'?'active':''}" onclick="viewMode='student';renderStudents()">
+          <i class="ti ti-user"></i> Per Student
+        </button>
+      </div>
+    </div>
+    <div class="filter-bar2" style="margin-top:8px">
+      ${buildFilterSel('Job Role', 'Job Role (from Job ID (Sync))', filterJobRole, 'filterJobRole')}
+      ${buildFilterSel('Job Source', 'Job Source (from Job ID (Sync))', filterJobSource, 'filterJobSource')}
+      ${buildFilterSel('Mitra', '[31] List Mitra (from Job ID (Sync))', filterMitra, 'filterMitra')}
+      ${(filterJobRole!=='all'||filterJobSource!=='all'||filterMitra!=='all') ? resetBtnHtml() : ''}
+    </div>`;
+
+  const list = filtered();
+  if (!list.length) {
+    wrapEl.innerHTML = `<div class="empty"><i class="ti ti-users"></i><span>Tidak ada data ditemukan</span></div>`;
+    return;
+  }
+
+  if (viewMode === 'student') {
+    renderStudentGroupView(list, wrapEl);
+  } else {
+    renderListView(list, wrapEl);
+  }
+}
+
+function buildFilterSel(label, fieldName, current, stateKey) {
+  const vals = uniqueVals(fieldName);
+  if (!vals.length) return '';
+  const isActive = current !== 'all';
+  return `<select class="filter-sel ${isActive?'active':''}" onchange="${stateKey}=this.value;renderStudents()">
+    <option value="all">${label}: Semua</option>
+    ${vals.map(v => `<option value="${v}" ${current===v?'selected':''}>${v}</option>`).join('')}
+  </select>`;
+}
+
+function renderListView(list, wrapEl) {
+  wrapEl.innerHTML = `<div class="card">
+    <table class="tbl">
+      <thead><tr>
+        <th>Student</th><th>Program</th><th>Job Role</th><th>Company</th><th>Status</th><th>Docs</th>
+      </tr></thead>
+      <tbody id="list-tbody"></tbody>
+    </table>
+  </div>`;
+  const tbody = document.getElementById('list-tbody');
+  tbody.innerHTML = list.map((s,i) => {
+    const name      = sf(s, fld('Name')) || '—';
+    const status    = sf(s, fld('Apply Status'));
+    const jobRole   = sf(s, 'Job Role (from Job ID (Sync))') || '—';
+    const company   = sf(s, 'Company Name (from Job ID (Sync))') || '—';
+    const pc        = PROG_CONFIG[s._prog] || { docs:[], urls:[] };
+    const uploaded  = [...pc.docs, ...pc.urls].filter(d => {
+      const files = attachments(s, d.field);
+      if (files.length) return true;
+      const v = sf(s, d.field); return v && v.startsWith('http');
+    }).length;
+    const total = pc.docs.length + pc.urls.length;
+    const pct = total ? Math.round(uploaded/total*100) : 0;
+    const barColor = pct===100?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
+    return `<tr data-idx="${i}">
+      <td><div class="name-cell">${avatarHtml(s,32)}<div style="font-weight:500;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${name}</div></div></td>
+      <td><span class="pill-prog p-${progSlug(s._prog)}">${s._prog}</span></td>
+      <td style="font-size:12px;color:var(--text2);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${jobRole}</td>
+      <td style="font-size:12px;color:var(--text2);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${company}</td>
+      <td>${badgeHtml(status)}</td>
+      <td style="min-width:80px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:3px">${uploaded}/${total}</div>
+        <div style="height:4px;background:var(--bg3);border-radius:2px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:${barColor};border-radius:2px;transition:.3s"></div>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+  tbody.querySelectorAll('tr[data-idx]').forEach(tr => {
+    tr.onclick = () => openModal(list[+tr.dataset.idx]);
+  });
+}
+
+function renderStudentGroupView(list, wrapEl) {
+  const groups = getStudentGroups(list);
+  const entries = [...groups.entries()];
+  wrapEl.innerHTML = `<div class="card">
+    <table class="tbl">
+      <thead><tr>
+        <th>Student</th><th>Program</th><th>Aplikasi</th><th>Status</th><th>Dokumen Terkumpul</th>
+      </tr></thead>
+      <tbody id="group-tbody"></tbody>
+    </table>
+  </div>`;
+  const tbody = document.getElementById('group-tbody');
+  tbody.innerHTML = entries.map(([email, recs], gi) => {
+    const s = recs[0];
+    const name = sf(s, fld('Name')).split(' - ')[0] || sf(s, fld('Name')) || '—';
+    const progs = [...new Set(recs.map(r => r._prog))];
+    const statuses = [...new Set(recs.map(r => sf(r, fld('Apply Status'))).filter(Boolean))];
+    const allDocs = getConsolidatedDocs(recs);
+    const foundDocs = allDocs.filter(d => d.found);
+    const pct = allDocs.length ? Math.round(foundDocs.length/allDocs.length*100) : 0;
+    const barColor = pct===100?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
+    return `<tr data-gi="${gi}" style="cursor:pointer">
+      <td><div class="name-cell">${avatarHtml(s,32)}<div>
+        <div style="font-weight:500">${name}</div>
+        <div style="font-size:11px;color:var(--text3)">${email}</div>
+      </div></div></td>
+      <td>${progs.map(p => `<span class="pill-prog p-${progSlug(p)}">${p}</span>`).join(' ')}</td>
+      <td><span class="count-badge">${recs.length}x apply</span></td>
+      <td style="max-width:160px">${statuses.slice(0,3).map(k => badgeHtml(k)).join(' ')}</td>
+      <td style="min-width:100px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:3px">${foundDocs.length}/${allDocs.length} dokumen</div>
+        <div style="height:4px;background:var(--bg3);border-radius:2px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:${barColor};border-radius:2px;transition:.3s"></div>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+  tbody.querySelectorAll('tr[data-gi]').forEach(tr => {
+    tr.onclick = () => {
+      const [email, recs] = entries[+tr.dataset.gi];
+      openStudentProfile(email, recs);
+    };
+  });
+}
+
+function openStudentProfile(email, records) {
+  const s = records[0];
+  const name = sf(s, fld('Name')).split(' - ')[0] || sf(s, fld('Name')) || '—';
+  const progs = [...new Set(records.map(r => r._prog))];
+  const allDocs = getConsolidatedDocs(records);
+  const foundDocs = allDocs.filter(d => d.found);
+
+  const appsHtml = records.map((rec, i) => {
+    const jobRole = sf(rec, 'Job Role (from Job ID (Sync))') || '—';
+    const company = sf(rec, 'Company Name (from Job ID (Sync))') || '—';
+    const mitra   = sf(rec, '[31] List Mitra (from Job ID (Sync))') || '—';
+    const status  = sf(rec, fld('Apply Status'));
+    return `<div class="sp-app-row" data-ri="${i}">
+      <div class="sp-app-num">${i+1}</div>
+      <span class="pill-prog p-${progSlug(rec._prog)}" style="flex-shrink:0">${rec._prog}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${company}</div>
+        <div style="font-size:11px;color:var(--text3)">${jobRole} · Mitra: ${mitra}</div>
+      </div>
+      ${badgeHtml(status)}
+      <i class="ti ti-chevron-right" style="font-size:14px;color:var(--text3);flex-shrink:0"></i>
+    </div>`;
+  }).join('');
+
+  const docsHtml = allDocs.map(d => {
+    if (d.found) {
+      return `<a href="${d.url}" target="_blank" class="doc-sum-item has">
+        <i class="ti ${d.icon}"></i><span>${d.label}</span>
+        <i class="ti ti-check" style="flex-shrink:0;margin-left:auto"></i>
+      </a>`;
+    }
+    return `<div class="doc-sum-item no">
+      <i class="ti ${d.icon}"></i><span>${d.label}</span>
+      <i class="ti ti-minus" style="flex-shrink:0;margin-left:auto"></i>
+    </div>`;
+  }).join('');
+
+  document.getElementById('modal-content').innerHTML = `
+    <div class="modal-hdr">
+      <div style="display:flex;align-items:center;gap:14px">
+        ${avatarHtml(s, 52)}
+        <div>
+          <div class="modal-name">${name}</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px">${email}</div>
+          <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+            ${progs.map(p => `<span class="pill-prog p-${progSlug(p)}">${p}</span>`).join('')}
+            <span class="count-badge">${records.length} aplikasi</span>
+            <span style="font-size:11px;color:var(--teal);background:var(--teal-bg);padding:2px 8px;border-radius:20px;font-weight:500">${foundDocs.length}/${allDocs.length} dok</span>
+          </div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
+    </div>
+
+    <div class="sect-hdr"><span><i class="ti ti-list-check"></i> Semua Aplikasi</span><span>klik untuk lihat detail</span></div>
+    <div class="card" style="overflow:hidden;margin-bottom:0">
+      <div class="sp-apps" id="sp-apps">${appsHtml}</div>
+    </div>
+
+    <div class="sect-hdr" style="margin-top:16px">
+      <span><i class="ti ti-paperclip"></i> Dokumen Terkumpul</span>
+      <span>${foundDocs.length}/${allDocs.length} uploaded</span>
+    </div>
+    <div class="doc-sum-grid">${docsHtml}</div>`;
+
+  document.getElementById('modal-overlay').style.display = 'flex';
+
+  // bind app row clicks
+  document.getElementById('sp-apps').querySelectorAll('.sp-app-row').forEach(el => {
+    el.onclick = () => openModal(records[+el.dataset.ri]);
+  });
+}
+
+// ========== PIPELINE ==========
+function renderPipeline() {
+  const board = document.getElementById('pip-board');
+  if (!isConfigured()) { board.innerHTML = noCfgHtml(); return; }
+  const list = filtered();
+  board.innerHTML = STATUS_KEYS.map(k => {
+    const m = STATUS[k];
+    const cards = list.filter(s => sf(s, fld('Apply Status')) === k);
+    return `<div class="pip-col">
+      <div class="pip-head" style="background:${m.bg};color:${m.dk}">
+        ${m.label} <span style="opacity:.7">${cards.length}</span>
+      </div>
+      <div class="pip-body" id="pip-${k}">
+        ${cards.length ? cards.map((s,i) => {
+          const name = sf(s, fld('Name')) || '—';
+          return `<div class="pip-card" data-k="${k}" data-i="${i}">
+            <div class="pc-name">${name}</div>
+            <div class="pc-prog">${s._prog}</div>
+          </div>`;
+        }).join('') : `<div style="font-size:12px;color:var(--text3);text-align:center;padding:12px 0">—</div>`}
+      </div>
+    </div>`;
+  }).join('');
+
+  STATUS_KEYS.forEach(k => {
+    const cards = list.filter(s => sf(s, fld('Apply Status')) === k);
+    document.getElementById('pip-' + k)?.querySelectorAll('.pip-card').forEach((el, i) => {
+      el.onclick = () => openModal(cards[i]);
+    });
+  });
+}
+
+// ========== MODAL ==========
+let modalStudent = null;
+let modalStatus = null;
+
+function docCardHtml(s, d) {
+  const files = attachments(s, d.field);
+  if (files.length) {
+    return `<a href="${files[0].url}" target="_blank" class="doc-card has">
+      <i class="ti ${d.icon} dc-i"></i>
+      <span class="dc-n">${d.label}</span>
+      <i class="ti ti-check dc-s"></i>
+    </a>`;
+  }
+  return `<div class="doc-card no">
+    <i class="ti ${d.icon} dc-i"></i>
+    <span class="dc-n">${d.label}</span>
+    <i class="ti ti-minus dc-s"></i>
+  </div>`;
+}
+
+function urlCardHtml(s, u) {
+  const val = sf(s, u.field);
+  if (val) {
+    return `<a href="${val}" target="_blank" class="doc-card has" style="border-color:var(--blue);background:var(--blue-bg);color:var(--blue-dk)">
+      <i class="ti ${u.icon} dc-i"></i>
+      <span class="dc-n">${u.label}</span>
+      <i class="ti ti-external-link dc-s"></i>
+    </a>`;
+  }
+  return `<div class="doc-card no"><i class="ti ${u.icon} dc-i"></i><span class="dc-n">${u.label}</span><i class="ti ti-minus dc-s"></i></div>`;
+}
+
+function openModal(s) {
+  modalStudent = s;
+  modalStatus = sf(s, fld('Apply Status')) || null;
+  const name    = sf(s, fld('Name')) || '—';
+  const email   = sf(s, fld('Email')) || sf(s, 'Final Email') || '—';
+  const pc      = PROG_CONFIG[s._prog] || { docs:[], urls:[], special:[] };
+
+  const jobRole    = sf(s, pc.jobRole)    || '—';
+  const jobSource  = sf(s, pc.jobSource)  || '—';
+  const company    = sf(s, pc.company)    || '—';
+  const mitra      = sf(s, pc.mitra)      || '—';
+  const country    = sf(s, pc.country)    || '—';
+  const prevStatus = sf(s, pc.prevStatus) || '—';
+  const needProc   = s.fields[pc.needProcess] ? '<i class="ti ti-check" style="color:var(--green)"></i> Ya' : '<span style="color:var(--text3)">—</span>';
+  const konfirm    = s.fields[pc.konfirmasi]   ? '<i class="ti ti-check" style="color:var(--green)"></i> Konfirmasi' : '<span style="color:var(--text3)">Belum</span>';
+
+  const uploaded = pc.docs.filter(d => attachments(s, d.field).length > 0).length;
+  const total    = pc.docs.length + pc.urls.length;
+
+  const docsHtml = [
+    ...pc.docs.map(d => docCardHtml(s, d)),
+    ...pc.urls.map(u => urlCardHtml(s, u)),
+  ].join('');
+
+  let credHtml = '';
+  if (pc.special.length) {
+    credHtml = `<div class="sect-hdr"><span><i class="ti ti-key"></i> Kredensial</span></div>
+    <div class="cred-grid">${pc.special.map((sp, i) => {
+      const val = sf(s, sp.field) || '—';
+      if (sp.isPass) {
+        return `<div class="cred-item">
+          <div class="cred-lbl">${sp.label}</div>
+          <div class="cred-val">
+            <span id="cv${i}" data-v="${val}">●●●●●●</span>
+            <button class="eye-btn" onclick="toggleCred('cv${i}')"><i class="ti ti-eye"></i></button>
+          </div></div>`;
+      }
+      return `<div class="cred-item"><div class="cred-lbl">${sp.label}</div><div class="cred-val">${val}</div></div>`;
+    }).join('')}</div>`;
+  }
+
+  document.getElementById('modal-content').innerHTML = `
+    <div class="modal-hdr">
+      <div style="display:flex;align-items:center;gap:14px">
+        ${avatarHtml(s, 56)}
+        <div>
+          <div class="modal-name">${name}</div>
+          <div class="modal-meta" style="display:flex;align-items:center;gap:6px;margin-top:4px">
+            <span class="pill-prog p-${progSlug(s._prog)}">${s._prog}</span>
+            ${badgeHtml(modalStatus)}
+          </div>
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
+    </div>
+
+    <div class="sect-hdr"><span><i class="ti ti-info-circle"></i> Informasi</span></div>
+    <div class="info-grid">
+      <div class="info-item"><div class="ii-lbl">Email</div><div class="ii-val" title="${email}">${email}</div></div>
+      <div class="info-item"><div class="ii-lbl">Job Role</div><div class="ii-val" title="${jobRole}">${jobRole}</div></div>
+      <div class="info-item"><div class="ii-lbl">Job Source</div><div class="ii-val">${jobSource}</div></div>
+      <div class="info-item"><div class="ii-lbl">Country</div><div class="ii-val">${country}</div></div>
+      <div class="info-item"><div class="ii-lbl">Company</div><div class="ii-val" title="${company}">${company}</div></div>
+      <div class="info-item"><div class="ii-lbl">Mitra</div><div class="ii-val" title="${mitra}">${mitra}</div></div>
+      <div class="info-item"><div class="ii-lbl">Prev Status</div><div class="ii-val">${prevStatus}</div></div>
+      <div class="info-item"><div class="ii-lbl">Konfirmasi</div><div class="ii-val">${konfirm}</div></div>
+      <div class="info-item"><div class="ii-lbl">Need Process</div><div class="ii-val">${needProc}</div></div>
+    </div>
+
+    <div class="sect-hdr">
+      <span><i class="ti ti-paperclip"></i> Dokumen</span>
+      <span>${uploaded}/${total} uploaded</span>
+    </div>
+    <div class="doc-grid">${docsHtml}</div>
+
+    ${credHtml}
+
+    <div class="status-section">
+      <div class="status-lbl">Ubah Status</div>
+      <div class="status-grid" id="status-opts">
+        ${STATUS_KEYS.map(k => {
+          const m = STATUS[k];
+          const sel = modalStatus === k;
+          return `<button class="s-opt ${sel?'sel':''}" data-k="${k}"
+            style="background:${m.bg};color:${m.dk};border-color:${sel?m.color:'transparent'}"
+            onclick="selectStatus('${k}')">${m.label}</button>`;
+        }).join('')}
+      </div>
+      <button class="btn primary" style="margin-top:14px;width:100%" id="save-btn" onclick="saveStatus()">
+        <i class="ti ti-check"></i> Simpan Perubahan
+      </button>
+    </div>`;
+
+  document.getElementById('modal-overlay').style.display = 'flex';
+}
+
+function toggleCred(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const v = el.dataset.v;
+  el.textContent = el.textContent.includes('●') ? v : '●'.repeat(v.length);
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').style.display = 'none';
+  modalStudent = null;
+}
+
+function selectStatus(k) {
+  modalStatus = k;
+  document.querySelectorAll('.s-opt').forEach(btn => {
+    const bk = btn.dataset.k;
+    const m = STATUS[bk];
+    const sel = bk === k;
+    btn.className = `s-opt ${sel?'sel':''}`;
+    btn.style.background = m.bg;
+    btn.style.color = m.dk;
+    btn.style.borderColor = sel ? m.color : 'transparent';
+  });
+}
+
+async function saveStatus() {
+  if (!modalStudent || saving) return;
+  saving = true;
+  const btn = document.getElementById('save-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader" style="animation:spin .7s linear infinite"></i> Menyimpan...';
+  try {
+    const oldStatus = sf(modalStudent, fld('Apply Status'));
+    const fields = { [fld('Apply Status')]: modalStatus };
+    await patchRecord(modalStudent._base, modalStudent._tbl, modalStudent.id, fields);
+    const idx = students.findIndex(s => s.id === modalStudent.id);
+    if (idx > -1) students[idx].fields[fld('Apply Status')] = modalStatus;
+    logToSheets(modalStudent, oldStatus, modalStatus);
+    showToast('Status berhasil diubah!', 'ok');
+    closeModal();
+    renderAll();
+  } catch (e) {
+    showToast('Gagal simpan: ' + e.message, 'err');
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-check"></i> Simpan Perubahan';
+  }
+  saving = false;
+}
+
+async function logToSheets(student, oldStatus, newStatus) {
+  if (!cfg.sheetsUrl) return;
+  try {
+    await fetch(cfg.sheetsUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        program:   student._prog,
+        applyId:   student.id,
+        studentId: sf(student, fld('Name')),
+        oldStatus: oldStatus || '—',
+        newStatus: newStatus,
+        changedBy: cfg.changedBy || 'Website',
+      })
+    });
+  } catch (e) {
+    console.warn('Gagal log ke Sheets:', e.message);
+  }
+}
+
+// ========== SETTINGS ==========
+function renderSettings() {
+  document.getElementById('settings-inner').innerHTML = `
+  <div class="settings-sect">
+    <div class="settings-title"><i class="ti ti-key"></i> API & Akses</div>
+    <div class="form-group">
+      <label class="form-lbl">Airtable Personal Access Token</label>
+      <input class="form-inp" id="cfg-token" type="password" value="${cfg.apiToken||''}" placeholder="pat...">
+      <div class="form-note">Buat di airtable.com/create/tokens · Scope: data.records:read, data.records:write</div>
+    </div>
+    <div class="form-group">
+      <label class="form-lbl">Password Login</label>
+      <input class="form-inp" id="cfg-pass" type="password" value="${cfg.password||''}" placeholder="workabroad2026">
+      <div class="form-note">Biarkan kosong untuk pakai default: workabroad2026</div>
+    </div>
+  </div>
+
+  <div class="settings-sect">
+    <div class="settings-title"><i class="ti ti-table"></i> Nama Tabel per Base</div>
+    <div class="form-group">
+      <label class="form-lbl">English — Blue/White Collar (appoL1kdbV0UyLwL4)</label>
+      <input class="form-inp" id="cfg-tbl-en" value="${cfg.tblEnglish||''}" placeholder="Nama tabel di base English...">
+    </div>
+    <div class="form-group">
+      <label class="form-lbl">Ausbildung (appNCTwB49kyXbR1V)</label>
+      <input class="form-inp" id="cfg-tbl-au" value="${cfg.tblAusbildung||''}" placeholder="Nama tabel di base Ausbildung...">
+    </div>
+    <div class="form-group">
+      <label class="form-lbl">Tokutei Ginou (app81I9rWfsU9PjVv)</label>
+      <input class="form-inp" id="cfg-tbl-tk" value="${cfg.tblTokutei||''}" placeholder="Nama tabel di base Tokutei...">
+    </div>
+  </div>
+
+  <div class="settings-sect">
+    <div class="settings-title"><i class="ti ti-tags"></i> Nama Field (sesuaikan dengan Airtable kamu)</div>
+    <div class="grid2">
+      <div class="form-group">
+        <label class="form-lbl">Field Nama</label>
+        <input class="form-inp" id="cfg-fld-name" value="${fld('Name')}" placeholder="Name">
+      </div>
+      <div class="form-group">
+        <label class="form-lbl">Field Email</label>
+        <input class="form-inp" id="cfg-fld-email" value="${fld('Email')}" placeholder="Email">
+      </div>
+      <div class="form-group">
+        <label class="form-lbl">Field Foto</label>
+        <input class="form-inp" id="cfg-fld-photo" value="${fld('Photo')}" placeholder="Photo">
+      </div>
+      <div class="form-group">
+        <label class="form-lbl">Field Dokumen</label>
+        <input class="form-inp" id="cfg-fld-docs" value="${fld('Documents')}" placeholder="Dokumen">
+      </div>
+      <div class="form-group">
+        <label class="form-lbl">Field Apply Status</label>
+        <input class="form-inp" id="cfg-fld-status" value="${fld('Apply Status')}" placeholder="Apply Status">
+      </div>
+    </div>
+  </div>
+
+  <div class="settings-sect">
+    <div class="settings-title"><i class="ti ti-brand-google"></i> Google Sheets History</div>
+    <div class="form-group">
+      <label class="form-lbl">Apps Script URL</label>
+      <input class="form-inp" id="cfg-sheets-url" value="${cfg.sheetsUrl||''}" placeholder="https://script.google.com/macros/s/...">
+      <div class="form-note">URL dari Apps Script yang sudah di-deploy sebagai Web App</div>
+    </div>
+    <div class="form-group">
+      <label class="form-lbl">Nama / Email (Changed By)</label>
+      <input class="form-inp" id="cfg-changed-by" value="${cfg.changedBy||''}" placeholder="admin@schoters.com">
+      <div class="form-note">Akan tercatat di kolom "Changed By" setiap kali status diubah</div>
+    </div>
+  </div>
+
+  <button class="btn primary" style="width:100%;padding:11px" onclick="saveSettings()">
+    <i class="ti ti-device-floppy"></i> Simpan & Muat Data
+  </button>`;
+}
+
+function saveSettings() {
+  cfg.apiToken   = document.getElementById('cfg-token').value.trim();
+  cfg.password   = document.getElementById('cfg-pass').value || 'workabroad2026';
+  cfg.tblEnglish = document.getElementById('cfg-tbl-en').value.trim();
+  cfg.tblAusbildung = document.getElementById('cfg-tbl-au').value.trim();
+  cfg.tblTokutei = document.getElementById('cfg-tbl-tk').value.trim();
+  cfg['fld_Name']    = document.getElementById('cfg-fld-name').value.trim() || 'Name';
+  cfg['fld_Email']   = document.getElementById('cfg-fld-email').value.trim() || 'Email';
+  cfg['fld_Photo']   = document.getElementById('cfg-fld-photo').value.trim() || 'Photo';
+  cfg['fld_Documents'] = document.getElementById('cfg-fld-docs').value.trim() || 'Documents';
+  cfg['fld_Apply Status'] = document.getElementById('cfg-fld-status').value.trim() || 'Apply Status';
+  cfg.sheetsUrl  = document.getElementById('cfg-sheets-url').value.trim();
+  cfg.changedBy  = document.getElementById('cfg-changed-by').value.trim();
+  saveCfg();
+  showToast('Pengaturan disimpan!', 'ok');
+  loadData();
+}
+
+// ========== NAVIGATION ==========
+function showPage(page, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  if (el) {
+    document.querySelectorAll('.nav-item[data-page]').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+  }
+  const titles = { dashboard:'Dashboard', students:'Students', settings:'Pengaturan' };
+  document.getElementById('pg-title').textContent = titles[page] || page;
+  if (page === 'dashboard') renderDashboard();
+  else if (page === 'students') renderStudents();
+  else if (page === 'settings') renderSettings();
+}
+
+// ========== TOAST ==========
+function showToast(msg, type='ok') {
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<i class="ti ti-${type==='ok'?'check':'alert-circle'}"></i> ${msg}`;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3200);
+}
+
+// ========== HELPER ==========
+function noCfgHtml() {
+  return `<div class="no-cfg">
+    <i class="ti ti-settings-off"></i>
+    <h3>Belum dikonfigurasi</h3>
+    <p>Masukkan API Token dan nama tabel di halaman Pengaturan untuk mulai menggunakan Job Tracker.</p>
+    <button class="btn primary" onclick="showPage('settings',document.querySelector('[data-page=settings]'))">
+      <i class="ti ti-settings"></i> Buka Pengaturan
+    </button>
+  </div>`;
+}
+
+// ========== INIT ==========
+function initApp() {
+  if (!isConfigured()) {
+    showPage('settings', document.querySelector('[data-page="settings"]'));
+    showToast('Lengkapi pengaturan dulu ya!', 'err');
+  } else {
+    loadData();
+  }
+}
+
+loadCfg();
+</script>
+</body>
+</html>
