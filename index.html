@@ -334,13 +334,16 @@ function resolveProgram(baseKey, rawRecord) {
 }
 
 const STATUS = {
-  SUB:     { label: 'Submitted',    bg: '#F1EFE8', color: '#5F5E5A', dk: '#2C2C2A' },
-  ADV_DOC: { label: 'Adv. Dokumen', bg: '#E6F1FB', color: '#378ADD', dk: '#0C447C' },
-  ADV_PAR: { label: 'Adv. Partner', bg: '#EEEDFE', color: '#534AB7', dk: '#26215C' },
-  ADV_USR: { label: 'Adv. User',    bg: '#E1F5EE', color: '#0F6E56', dk: '#04342C' },
-  OFF:     { label: 'Offer',        bg: '#FAEEDA', color: '#BA7517', dk: '#412402' },
-  ACC:     { label: 'Accepted',     bg: '#EAF3DE', color: '#639922', dk: '#173404' },
-  REJ:     { label: 'Rejected',     bg: '#FCEBEB', color: '#A32D2D', dk: '#501313' },
+  'Submitted':         { label: 'Submitted',        bg: '#F1EFE8', color: '#5F5E5A', dk: '#2C2C2A' },
+  'Docs Screening':    { label: 'Docs Screening',   bg: '#E6F1FB', color: '#378ADD', dk: '#0C447C' },
+  'Partner Interview': { label: 'Partner Interview', bg: '#EEEDFE', color: '#534AB7', dk: '#26215C' },
+  'User Interview':    { label: 'User Interview',   bg: '#E1F5EE', color: '#0F6E56', dk: '#04342C' },
+  'Job Offer':         { label: 'Job Offer',        bg: '#FAEEDA', color: '#BA7517', dk: '#412402' },
+  'Work Permit':       { label: 'Work Permit',      bg: '#EAF3DE', color: '#639922', dk: '#173404' },
+  'Visa':              { label: 'Visa',             bg: '#F0EAFA', color: '#7B3DB5', dk: '#3D1260' },
+  'Flew':              { label: 'Flew',             bg: '#E0F4FF', color: '#0077B6', dk: '#004A73' },
+  'LoA':               { label: 'LoA',             bg: '#FFF3E0', color: '#E65100', dk: '#8D3200' },
+  'Rejected':          { label: 'Rejected',         bg: '#FCEBEB', color: '#A32D2D', dk: '#501313' },
 };
 const STATUS_KEYS = Object.keys(STATUS);
 
@@ -442,7 +445,7 @@ const PROG_CONFIG = {
 // Siapapun yang punya link bisa lihat token ini lewat "View Page Source",
 // jadi pastikan token hanya punya scope read+write ke 3 base ini saja.
 const DEFAULT_CFG = {
-  apiToken: 'patqCSQPzGMTjvM1C.1cfa3445d71487b98312ec3162b575605c004cce3ea5a859a7ded7ac95d2c575',
+  apiToken: 'PASTE_AIRTABLE_TOKEN_KAMU_DI_SINI',
   password: 'workabroad2026',
   tblEnglish: 'Job Apply',
   tblAusbildung: 'Job Apply',
@@ -554,10 +557,10 @@ function avatarHtml(rec, size = 32) {
   return `<div style="${s}">${initials(name)}</div>`;
 }
 function badgeHtml(status) {
-  if (!status) return `<span class="badge b-null">—</span>`;
+  if (!status) return `<span class="badge" style="background:var(--bg3);color:var(--text3)">—</span>`;
   const m = STATUS[status];
-  if (!m) return `<span class="badge b-null">${status}</span>`;
-  return `<span class="badge b-${status}">${m.label}</span>`;
+  if (!m) return `<span class="badge" style="background:var(--bg3);color:var(--text3)">${status}</span>`;
+  return `<span class="badge" style="background:${m.bg};color:${m.dk}">${m.label}</span>`;
 }
 
 // ========== LOAD DATA ==========
@@ -681,7 +684,7 @@ function renderDashboard() {
     <div class="metric" onclick="statusFilter='all';showPage('students',document.querySelector('[data-page=students]'))">
       <div class="metric-lbl">Total</div><div class="metric-val">${total}</div><div class="metric-sub">Semua student</div>
     </div>
-    ${['SUB','ADV_DOC','ADV_PAR','OFF','ACC'].map(k => `
+    ${['Submitted','Docs Screening','Job Offer','Flew','Rejected'].map(k => `
     <div class="metric" onclick="statusFilter='${k}';showPage('students',document.querySelector('[data-page=students]'));renderStudents()">
       <div class="metric-lbl">${STATUS[k].label}</div>
       <div class="metric-val" style="color:${STATUS[k].color}">${counts[k]||0}</div>
