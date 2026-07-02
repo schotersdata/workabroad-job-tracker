@@ -270,6 +270,7 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;
     <div class="nav-item" onclick="filterByProgram('Ausbildung',this)"><i class="ti ti-flag"></i>Ausbildung</div>
 
     <div class="nav-sect">Lainnya</div>
+    <div class="nav-item" data-page="mitra" onclick="showPage('mitra',this)"><i class="ti ti-building"></i>Mitra</div>
     <div class="nav-item" data-page="settings" onclick="showPage('settings',this)"><i class="ti ti-settings"></i>Pengaturan</div>
 
     <div class="sb-footer">
@@ -294,6 +295,7 @@ html,body{height:100%;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;
         <div class="filter-row" id="status-chips"></div>
         <div id="students-wrap"></div>
       </div>
+      <div class="page" id="page-mitra"><div id="mitra-inner" style="padding-bottom:20px"></div></div>
       <div class="page" id="page-settings"><div id="settings-inner"></div></div>
     </div>
   </div>
@@ -736,6 +738,114 @@ function renderDashboard() {
   students.slice(0,8).forEach((s,i) => {
     const divs = document.getElementById('dash-inner').querySelectorAll('[onclick^="openModal"]');
     if (divs[i]) divs[i].onclick = () => openModal(s);
+  });
+
+  // Cross-tab: status per program
+  const SHORT_STATUS = STATUS_KEYS.filter(k => !['Partner Interview','User Interview','Work Permit','Visa'].includes(k));
+  el.innerHTML += `
+  <div class="card" style="padding:18px;margin-top:16px;overflow-x:auto">
+    <div class="sect-title">Status per Program</div>
+    <table style="width:100%;border-collapse:collapse;font-size:12px">
+      <thead>
+        <tr>
+          <th style="text-align:left;padding:7px 10px;border-bottom:0.5px solid var(--border);background:var(--bg3);font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap">Program</th>
+          ${STATUS_KEYS.map(k => `<th style="text-align:center;padding:7px 8px;border-bottom:0.5px solid var(--border);background:var(--bg3);font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;min-width:70px"><span class="badge" style="background:${STATUS[k].bg};color:${STATUS[k].dk}">${STATUS[k].label}</span></th>`).join('')}
+          <th style="text-align:center;padding:7px 10px;border-bottom:0.5px solid var(--border);background:var(--bg3);font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${PROGRAM_KEYS.map(prog => {
+          const ps = students.filter(s => s._prog === prog);
+          const total = ps.length;
+          if (!total) return '';
+          return `<tr>
+            <td style="padding:9px 10px;border-bottom:0.5px solid var(--border)"><span class="pill-prog p-${progSlug(prog)}">${prog}</span></td>
+            ${STATUS_KEYS.map(k => {
+              const cnt = ps.filter(s => sf(s, fld('Apply Status')) === k).length;
+              const pct = total ? Math.round(cnt/total*100) : 0;
+              return `<td style="padding:9px 8px;border-bottom:0.5px solid var(--border);text-align:center">
+                ${cnt > 0
+                  ? `<div style="font-weight:600">${cnt}</div><div style="font-size:10px;color:var(--text3)">${pct}%</div>`
+                  : `<span style="color:var(--border2)">—</span>`}
+              </td>`;
+            }).join('')}
+            <td style="padding:9px 10px;border-bottom:0.5px solid var(--border);text-align:center;font-weight:600">${total}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>`;
+}
+
+// ========== MITRA VIEW ==========
+function renderMitra() {
+  const el = document.getElementById('mitra-inner');
+  if (!isConfigured() || !students.length) {
+    el.innerHTML = '<div class="empty"><i class="ti ti-building"></i><span>Data belum dimuat — klik Refresh dulu</span></div>';
+    return;
+  }
+
+  // Group by mitra
+  const mitraMap = new Map();
+  const MITRA_FIELD = '[31] List Mitra (from Job ID (Sync))';
+  const ROLE_FIELD  = 'Job Role (from Job ID (Sync))';
+  students.forEach(s => {
+    const mitra = sf(s, MITRA_FIELD) || '(Belum ada mitra)';
+    if (!mitraMap.has(mitra)) mitraMap.set(mitra, []);
+    mitraMap.get(mitra).push(s);
+  });
+  const entries = [...mitraMap.entries()]
+    .filter(([m]) => m !== '(Belum ada mitra)')
+    .sort((a, b) => b[1].length - a[1].length);
+
+  // Search input
+  const searchId = 'mitra-search';
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+      <div class="search-box" style="flex:1;max-width:320px">
+        <i class="ti ti-search"></i>
+        <input type="text" id="${searchId}" placeholder="Cari mitra..." oninput="filterMitraCards(this.value)">
+      </div>
+      <span style="font-size:13px;color:var(--text3)">${entries.length} mitra ditemukan</span>
+    </div>
+    <div id="mitra-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px">
+      ${entries.map(([mitra, recs]) => {
+        const roles = [...new Set(recs.map(s => sf(s, ROLE_FIELD)).filter(Boolean))].sort();
+        const progs = [...new Set(recs.map(s => s._prog))];
+        const statusCounts = {};
+        recs.forEach(s => {
+          const st = sf(s, fld('Apply Status')) || '—';
+          statusCounts[st] = (statusCounts[st] || 0) + 1;
+        });
+        const topStatuses = Object.entries(statusCounts).sort((a,b)=>b[1]-a[1]).slice(0,3);
+        const slug = mitra.replace(/[^a-zA-Z0-9]/g,'').toLowerCase();
+        return `<div class="card mitra-card" data-mitra="${mitra.toLowerCase()}" style="padding:16px">
+          <div style="font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text)">${mitra}</div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">
+            ${progs.map(p => `<span class="pill-prog p-${progSlug(p)}">${p}</span>`).join('')}
+          </div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:10px;display:flex;gap:12px">
+            <span><strong>${recs.length}</strong> student</span>
+            <span><strong>${roles.length}</strong> job role</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px">
+            ${roles.length ? roles.map(role => `
+              <div style="font-size:11px;padding:5px 9px;background:var(--bg3);border-radius:var(--r);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px">
+                <span style="font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${role}</span>
+                <span style="color:var(--text3);flex-shrink:0">${recs.filter(s=>sf(s,ROLE_FIELD)===role).length}x</span>
+              </div>`).join('') : '<span style="font-size:12px;color:var(--text3)">—</span>'}
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            ${topStatuses.map(([st,cnt]) => `<span class="badge" style="background:${(STATUS[st]||{bg:'var(--bg3)'}).bg};color:${(STATUS[st]||{dk:'var(--text3)'}).dk};font-size:10px">${st} (${cnt})</span>`).join('')}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+function filterMitraCards(q) {
+  document.querySelectorAll('.mitra-card').forEach(card => {
+    card.style.display = card.dataset.mitra.includes(q.toLowerCase()) ? '' : 'none';
   });
 }
 
@@ -1287,10 +1397,11 @@ function showPage(page, el) {
     document.querySelectorAll('.nav-item[data-page]').forEach(n => n.classList.remove('active'));
     el.classList.add('active');
   }
-  const titles = { dashboard:'Dashboard', students:'Students', settings:'Pengaturan' };
+  const titles = { dashboard:'Dashboard', students:'Students', mitra:'Mitra', settings:'Pengaturan' };
   document.getElementById('pg-title').textContent = titles[page] || page;
   if (page === 'dashboard') renderDashboard();
   else if (page === 'students') renderStudents();
+  else if (page === 'mitra') renderMitra();
   else if (page === 'settings') renderSettings();
 }
 
