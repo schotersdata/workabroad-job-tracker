@@ -138,7 +138,7 @@ const PROG_CONFIG = {
 // Siapapun yang punya link bisa lihat token ini lewat "View Page Source",
 // jadi pastikan token hanya punya scope read+write ke 3 base ini saja.
 const DEFAULT_CFG = {
-  apiToken: 'PASTE_AIRTABLE_TOKEN_KAMU_DI_SINI',
+  apiToken: 'patqCSQPzGMTjvM1C.1cfa3445d71487b98312ec3162b575605c004cce3ea5a859a7ded7ac95d2c575',
   password: 'workabroad2026',
   tblEnglish: 'Job Apply',
   tblAusbildung: 'Job Apply',
