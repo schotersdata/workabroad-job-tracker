@@ -158,6 +158,7 @@ let filterJobRole = 'all';
 let filterJobSource = 'all';
 let filterMitra = 'all';
 let viewMode = 'list'; // 'list' or 'student'
+let _roleLookup = []; // for job role click lookup
 
 // ========== CONFIG ==========
 function loadCfg() {
@@ -471,6 +472,7 @@ function renderDashboard() {
 
 // ========== MITRA VIEW ==========
 function renderJobSource() {
+  _roleLookup = [];
   const el = document.getElementById('mitra-inner');
   if (!isConfigured() || !students.length) {
     el.innerHTML = '<div class="empty"><i class="ti ti-arrows-right-left"></i><span>Data belum dimuat — klik Refresh dulu</span></div>';
@@ -479,7 +481,6 @@ function renderJobSource() {
 
   const SRC_FIELD   = 'Job Source (from Job ID (Sync))';
   const ROLE_FIELD  = 'Job Role (from Job ID (Sync))';
-  const MITRA_FIELD = '[31] List Mitra (from Job ID (Sync))';
 
   // Group by Job Source
   const srcMap = new Map();
@@ -498,19 +499,37 @@ function renderJobSource() {
         <i class="ti ti-search"></i>
         <input type="text" placeholder="Cari job source..." oninput="filterJobSourceCards(this.value)">
       </div>
-      <span style="font-size:13px;color:var(--text3)">${entries.length} job source</span>
+      <span style="font-size:13px;color:var(--text3)">${entries.length} job source · ${students.length} student</span>
     </div>
     <div id="jobsrc-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px">
       ${entries.map(([src, recs]) => {
-        const roles   = [...new Set(recs.map(s => sf(s, ROLE_FIELD)).filter(Boolean))].sort();
-        const mitras  = [...new Set(recs.map(s => sf(s, MITRA_FIELD)).filter(Boolean))].sort();
-        const progs   = [...new Set(recs.map(s => s._prog))];
+        const roles  = [...new Map(
+          recs.map(s => [sf(s, ROLE_FIELD), sf(s, ROLE_FIELD)]).filter(([k]) => k)
+        ).keys()].sort((a, b) => {
+          const ca = recs.filter(s => sf(s, ROLE_FIELD) === a).length;
+          const cb = recs.filter(s => sf(s, ROLE_FIELD) === b).length;
+          return cb - ca;
+        });
+        const progs  = [...new Set(recs.map(s => s._prog))];
         const statusCounts = {};
         recs.forEach(s => {
           const st = sf(s, fld('Apply Status')) || '—';
           statusCounts[st] = (statusCounts[st] || 0) + 1;
         });
-        const topStatuses = Object.entries(statusCounts).sort((a,b)=>b[1]-a[1]).slice(0,4);
+        const topStatuses = Object.entries(statusCounts).sort((a,b)=>b[1]-a[1]).slice(0,5);
+
+        const roleRows = roles.map(role => {
+          const cnt = recs.filter(s => sf(s, ROLE_FIELD) === role).length;
+          const pct = Math.round(cnt/recs.length*100);
+          const li  = _roleLookup.push({ src, role }) - 1;
+          return `<div class="role-row" data-li="${li}" style="font-size:11px;padding:6px 9px;background:var(--bg3);border-radius:var(--r);border:0.5px solid var(--border);display:flex;align-items:center;gap:8px;cursor:pointer;transition:.12s">
+            <i class="ti ti-users" style="font-size:13px;color:var(--text3);flex-shrink:0"></i>
+            <span style="font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${role}</span>
+            <span style="color:var(--text3);flex-shrink:0">${cnt}x · ${pct}%</span>
+            <i class="ti ti-chevron-right" style="font-size:12px;color:var(--text3);flex-shrink:0"></i>
+          </div>`;
+        }).join('');
+
         return `<div class="card jobsrc-card" data-src="${src.toLowerCase()}" style="padding:16px">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
             <i class="ti ti-arrows-right-left" style="font-size:16px;color:var(--blue)"></i>
@@ -522,45 +541,101 @@ function renderJobSource() {
           <div style="font-size:12px;color:var(--text2);margin-bottom:12px;display:flex;gap:14px">
             <span><strong>${recs.length}</strong> student</span>
             <span><strong>${roles.length}</strong> job role</span>
-            <span><strong>${mitras.length}</strong> mitra</span>
           </div>
-
-          <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Job Roles</div>
-          <div style="display:flex;flex-direction:column;gap:3px;margin-bottom:12px">
-            ${roles.slice(0,5).map(role => {
-              const cnt = recs.filter(s => sf(s, ROLE_FIELD) === role).length;
-              const pct = Math.round(cnt/recs.length*100);
-              return `<div style="font-size:11px;padding:5px 9px;background:var(--bg3);border-radius:var(--r);border:0.5px solid var(--border);display:flex;align-items:center;gap:8px">
-                <span style="font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${role}</span>
-                <span style="color:var(--text3);flex-shrink:0;font-size:10px">${cnt}x · ${pct}%</span>
-              </div>`;
-            }).join('')}
-            ${roles.length > 5 ? `<div style="font-size:11px;color:var(--text3);padding:3px 9px">+${roles.length-5} lainnya</div>` : ''}
+          <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">
+            Job Roles <span style="font-weight:400;font-size:10px;color:var(--text3)">— klik untuk lihat student</span>
           </div>
-
-          <div style="font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Mitra / Perusahaan</div>
-          <div style="display:flex;flex-direction:column;gap:3px;margin-bottom:12px">
-            ${mitras.slice(0,4).map(m => {
-              const cnt = recs.filter(s => sf(s, MITRA_FIELD) === m).length;
-              return `<div style="font-size:11px;padding:4px 9px;background:var(--blue-bg);border-radius:var(--r);color:var(--blue-dk);display:flex;justify-content:space-between">
-                <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${m}</span>
-                <span style="flex-shrink:0;margin-left:8px;color:var(--blue)">${cnt}x</span>
-              </div>`;
-            }).join('')}
-            ${mitras.length > 4 ? `<div style="font-size:11px;color:var(--text3);padding:3px 9px">+${mitras.length-4} lainnya</div>` : ''}
-          </div>
-
+          <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:12px">${roleRows}</div>
           <div style="display:flex;gap:5px;flex-wrap:wrap">
             ${topStatuses.map(([st,cnt]) => `<span class="badge" style="background:${(STATUS[st]||{bg:'var(--bg3)'}).bg};color:${(STATUS[st]||{dk:'var(--text3)'}).dk};font-size:10px">${st} (${cnt})</span>`).join('')}
           </div>
         </div>`;
       }).join('')}
     </div>`;
+
+  // Event delegation for role rows
+  document.getElementById('jobsrc-grid').addEventListener('click', e => {
+    const row = e.target.closest('.role-row[data-li]');
+    if (!row) return;
+    const { src, role } = _roleLookup[+row.dataset.li];
+    openJobRoleStudents(src, role);
+  });
+
+  // Hover effect via delegation
+  document.getElementById('jobsrc-grid').addEventListener('mouseover', e => {
+    const row = e.target.closest('.role-row');
+    if (row) row.style.background = 'var(--blue-bg)';
+  });
+  document.getElementById('jobsrc-grid').addEventListener('mouseout', e => {
+    const row = e.target.closest('.role-row');
+    if (row) row.style.background = 'var(--bg3)';
+  });
 }
 
 function filterJobSourceCards(q) {
   document.querySelectorAll('.jobsrc-card').forEach(card => {
     card.style.display = card.dataset.src.includes(q.toLowerCase()) ? '' : 'none';
+  });
+}
+
+function openJobRoleStudents(src, role) {
+  const SRC_FIELD  = 'Job Source (from Job ID (Sync))';
+  const ROLE_FIELD = 'Job Role (from Job ID (Sync))';
+  const recs = students.filter(s =>
+    sf(s, SRC_FIELD) === src && sf(s, ROLE_FIELD) === role
+  );
+
+  document.getElementById('modal-content').innerHTML = `
+    <div class="modal-hdr">
+      <div>
+        <div class="modal-name">${role}</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;display:flex;align-items:center;gap:6px">
+          <i class="ti ti-arrows-right-left"></i> ${src}
+          <span style="color:var(--border2)">·</span>
+          <strong>${recs.length}</strong> student
+        </div>
+      </div>
+      <button class="modal-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="card" style="overflow:hidden">
+      <table class="tbl">
+        <thead><tr>
+          <th>Student</th><th>Program</th><th>Status</th><th>Docs</th>
+        </tr></thead>
+        <tbody id="role-tbody"></tbody>
+      </table>
+    </div>`;
+
+  document.getElementById('modal-overlay').style.display = 'flex';
+
+  const tbody = document.getElementById('role-tbody');
+  tbody.innerHTML = recs.map((s, i) => {
+    const name   = sf(s, fld('Name')) || '—';
+    const status = sf(s, fld('Apply Status'));
+    const pc     = PROG_CONFIG[s._prog] || { docs:[], urls:[] };
+    const uploaded = [...pc.docs, ...pc.urls].filter(d => {
+      const files = attachments(s, d.field);
+      if (files.length) return true;
+      const v = sf(s, d.field); return v && v.startsWith('http');
+    }).length;
+    const total    = pc.docs.length + pc.urls.length;
+    const pct      = total ? Math.round(uploaded/total*100) : 0;
+    const barColor = pct===100?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
+    return `<tr data-si="${i}">
+      <td><div class="name-cell">${avatarHtml(s,28)}<div style="font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px">${name}</div></div></td>
+      <td><span class="pill-prog p-${progSlug(s._prog)}">${s._prog}</span></td>
+      <td>${badgeHtml(status)}</td>
+      <td style="min-width:80px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:3px">${uploaded}/${total}</div>
+        <div style="height:3px;background:var(--bg3);border-radius:2px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:${barColor};border-radius:2px"></div>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  tbody.querySelectorAll('tr[data-si]').forEach(tr => {
+    tr.onclick = () => openModal(recs[+tr.dataset.si]);
   });
 }
 
