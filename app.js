@@ -138,7 +138,7 @@ const PROG_CONFIG = {
 // Siapapun yang punya link bisa lihat token ini lewat "View Page Source",
 // jadi pastikan token hanya punya scope read+write ke 3 base ini saja.
 const DEFAULT_CFG = {
-  apiToken: 'patqCSQPzGMTjvM1C.1cfa3445d71487b98312ec3162b575605c004cce3ea5a859a7ded7ac95d2c575',
+  apiToken: 'PASTE_AIRTABLE_TOKEN_KAMU_DI_SINI',
   password: 'workabroad2026',
   tblEnglish: 'Job Apply',
   tblAusbildung: 'Job Apply',
@@ -374,12 +374,33 @@ function renderDashboard() {
   Object.keys(PROGRAM_META).forEach(p => progCounts[p] = students.filter(s => s._prog === p).length);
   const maxProg = Math.max(...Object.values(progCounts), 1);
 
+  // Unique student counts for 1on1 & docrev
+  const F1ON1   = '#1on1 Interview from Reguler';
+  const FDOCREV = '#Docrev from Reguler';
+  const emailKey = s => sf(s, fld('Email')) || sf(s, 'Final Email') || s.id;
+  const done1on1   = new Set(students.filter(s => (s.fields[F1ON1]   || 0) > 0).map(emailKey)).size;
+  const doneDocrev = new Set(students.filter(s => (s.fields[FDOCREV] || 0) > 0).map(emailKey)).size;
+
+  // Success statuses
+  const SUCCESS_ST = ['Job Offer','Work Permit','Visa','Flew','LoA'];
+  const PROG_ST    = ['Docs Screening','Partner Interview','User Interview'];
+
   el.innerHTML = `
-  <div class="metrics">
+  <div class="metrics" style="grid-template-columns:repeat(6,1fr)">
     <div class="metric" onclick="statusFilter='all';showPage('students',document.querySelector('[data-page=students]'))">
-      <div class="metric-lbl">Total</div><div class="metric-val">${total}</div><div class="metric-sub">Semua student</div>
+      <div class="metric-lbl">Total Student</div><div class="metric-val">${total}</div><div class="metric-sub">Semua program</div>
     </div>
-    ${['Submitted','Docs Screening','Job Offer','Flew','Rejected'].map(k => `
+    <div class="metric">
+      <div class="metric-lbl">Sudah 1on1</div>
+      <div class="metric-val" style="color:var(--blue)">${done1on1}</div>
+      <div class="metric-sub">${total ? Math.round(done1on1/total*100) : 0}% dari total</div>
+    </div>
+    <div class="metric">
+      <div class="metric-lbl">Sudah Docrev</div>
+      <div class="metric-val" style="color:var(--purple)">${doneDocrev}</div>
+      <div class="metric-sub">${total ? Math.round(doneDocrev/total*100) : 0}% dari total</div>
+    </div>
+    ${['Job Offer','Flew','Rejected'].map(k => `
     <div class="metric" onclick="statusFilter='${k}';showPage('students',document.querySelector('[data-page=students]'));renderStudents()">
       <div class="metric-lbl">${STATUS[k].label}</div>
       <div class="metric-val" style="color:${STATUS[k].color}">${counts[k]||0}</div>
@@ -390,21 +411,29 @@ function renderDashboard() {
     <div class="card" style="padding:18px">
       <div class="sect-title">Per Program</div>
       <div class="prog-bars">
-        ${Object.entries(PROGRAM_META).map(([prog, b]) => `
-        <div class="prog-row">
-          <span class="prog-nm">${prog}</span>
-          <div class="prog-track"><div class="prog-fill" style="width:${Math.round((progCounts[prog]||0)/maxProg*100)}%;background:${b.color}"></div></div>
-          <span class="prog-n">${progCounts[prog]||0}</span>
-        </div>`).join('')}
+        ${Object.entries(PROGRAM_META).map(([prog, b]) => {
+          const cnt = progCounts[prog]||0;
+          const pct = total ? Math.round(cnt/total*100) : 0;
+          return `<div class="prog-row">
+            <span class="prog-nm" style="width:110px">${prog}</span>
+            <div class="prog-track"><div class="prog-fill" style="width:${Math.round(cnt/maxProg*100)}%;background:${b.color}"></div></div>
+            <span class="prog-n" style="width:30px">${cnt}</span>
+            <span style="font-size:10px;color:var(--text3);width:30px;text-align:right">${pct}%</span>
+          </div>`;
+        }).join('')}
       </div>
       <div style="margin-top:18px" class="sect-title">Per Status</div>
       <div class="prog-bars">
-        ${STATUS_KEYS.map(k => `
-        <div class="prog-row">
-          <span class="prog-nm">${STATUS[k].label}</span>
-          <div class="prog-track"><div class="prog-fill" style="width:${Math.round((counts[k]||0)/total*100)}%;background:${STATUS[k].color}"></div></div>
-          <span class="prog-n">${counts[k]||0}</span>
-        </div>`).join('')}
+        ${STATUS_KEYS.map(k => {
+          const cnt = counts[k]||0;
+          const pct = total ? Math.round(cnt/total*100) : 0;
+          return `<div class="prog-row">
+            <span class="prog-nm" style="width:110px">${STATUS[k].label}</span>
+            <div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${STATUS[k].color}"></div></div>
+            <span class="prog-n" style="width:30px">${cnt}</span>
+            <span style="font-size:10px;color:var(--text3);width:30px;text-align:right">${pct}%</span>
+          </div>`;
+        }).join('')}
       </div>
     </div>
     <div class="card" style="padding:18px">
@@ -423,6 +452,54 @@ function renderDashboard() {
             ${badgeHtml(status)}
           </div>`;
         }).join('')}
+      </div>
+    </div>
+  </div>`;
+
+  // Success rate per program
+  el.innerHTML += `
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
+    <div class="card" style="padding:18px">
+      <div class="sect-title">Success Rate per Program
+        <span style="font-size:11px;font-weight:400;color:var(--text3)">Job Offer / Work Permit / Visa / Flew / LoA</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${PROGRAM_KEYS.map(prog => {
+          const ps       = students.filter(s => s._prog === prog);
+          const tot      = ps.length;
+          if (!tot) return '';
+          const success  = ps.filter(s => SUCCESS_ST.includes(sf(s, fld('Apply Status')))).length;
+          const onprog   = ps.filter(s => PROG_ST.includes(sf(s, fld('Apply Status')))).length;
+          const rejected = ps.filter(s => sf(s, fld('Apply Status')) === 'Rejected').length;
+          const pct      = Math.round(success/tot*100);
+          const b        = PROGRAM_META[prog];
+          return `<div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+              <span class="pill-prog p-${progSlug(prog)}">${prog}</span>
+              <span style="font-size:12px;font-weight:600;color:${b.color}">${pct}% berhasil</span>
+            </div>
+            <div style="height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-bottom:4px">
+              <div style="height:100%;width:${pct}%;background:${b.color};border-radius:3px;transition:.5s"></div>
+            </div>
+            <div style="font-size:11px;color:var(--text3);display:flex;gap:10px">
+              <span>✅ ${success} berhasil</span>
+              <span>🔵 ${onprog} on progress</span>
+              <span>❌ ${rejected} gagal</span>
+              <span style="margin-left:auto">Total: ${tot}</span>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+    <div class="card" style="padding:18px">
+      <div class="sect-title">Average Days per Tahapan
+        <span style="font-size:11px;font-weight:400;color:var(--text3)">estimasi waktu di setiap fase</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 0;gap:10px;color:var(--text3);text-align:center">
+        <i class="ti ti-clock" style="font-size:36px;color:var(--border2)"></i>
+        <div style="font-size:13px;font-weight:500;color:var(--text2)">Sedang dalam pengembangan</div>
+        <div style="font-size:12px;max-width:260px;line-height:1.6">Fitur ini akan menghitung rata-rata hari di setiap status (Submitted → Docs Screening → dst) berdasarkan data history Google Sheets.</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:4px">Tersedia setelah history terkumpul dari job apply form terbaru.</div>
       </div>
     </div>
   </div>`;
@@ -697,7 +774,7 @@ function renderListView(list, wrapEl) {
   wrapEl.innerHTML = `<div class="card">
     <table class="tbl">
       <thead><tr>
-        <th>Student</th><th>Program</th><th>Job Role</th><th>Company</th><th>Status</th><th>Docs</th>
+        <th>Student</th><th>Program</th><th>Job Role</th><th>Company</th><th>Status</th><th>Docs</th><th>Notes SSO</th>
       </tr></thead>
       <tbody id="list-tbody"></tbody>
     </table>
@@ -729,6 +806,7 @@ function renderListView(list, wrapEl) {
           <div style="height:100%;width:${pct}%;background:${barColor};border-radius:2px;transition:.3s"></div>
         </div>
       </td>
+      <td style="font-size:11px;color:var(--text2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${sf(s, fld('Notes SSO'))}">${sf(s, fld('Notes SSO')) || '<span style="color:var(--border2)">—</span>'}</td>
     </tr>`;
   }).join('');
   tbody.querySelectorAll('tr[data-idx]').forEach(tr => {
@@ -742,7 +820,11 @@ function renderStudentGroupView(list, wrapEl) {
   wrapEl.innerHTML = `<div class="card">
     <table class="tbl">
       <thead><tr>
-        <th>Student</th><th>Program</th><th>Aplikasi</th><th>Status</th><th>Dokumen Terkumpul</th>
+        <th>Student</th><th>Program</th><th>Aplikasi</th>
+        <th style="color:var(--green)">✅ Berhasil</th>
+        <th style="color:var(--blue)">🔵 Progress</th>
+        <th style="color:var(--red)">❌ Gagal</th>
+        <th>Dokumen</th>
       </tr></thead>
       <tbody id="group-tbody"></tbody>
     </table>
@@ -757,6 +839,11 @@ function renderStudentGroupView(list, wrapEl) {
     const foundDocs = allDocs.filter(d => d.found);
     const pct = allDocs.length ? Math.round(foundDocs.length/allDocs.length*100) : 0;
     const barColor = pct===100?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
+    const S_SUCCESS = ['Job Offer','Work Permit','Visa','Flew','LoA'];
+    const S_PROG    = ['Docs Screening','Partner Interview','User Interview'];
+    const cntBerhasil = recs.filter(r => S_SUCCESS.includes(sf(r, fld('Apply Status')))).length;
+    const cntProgress = recs.filter(r => S_PROG.includes(sf(r, fld('Apply Status')))).length;
+    const cntGagal    = recs.filter(r => sf(r, fld('Apply Status')) === 'Rejected').length;
     return `<tr data-gi="${gi}" style="cursor:pointer">
       <td><div class="name-cell">${avatarHtml(s,32)}<div>
         <div style="font-weight:500">${name}</div>
@@ -764,9 +851,17 @@ function renderStudentGroupView(list, wrapEl) {
       </div></div></td>
       <td>${progs.map(p => `<span class="pill-prog p-${progSlug(p)}">${p}</span>`).join(' ')}</td>
       <td><span class="count-badge">${recs.length}x apply</span></td>
-      <td style="max-width:160px">${statuses.slice(0,3).map(k => badgeHtml(k)).join(' ')}</td>
-      <td style="min-width:100px">
-        <div style="font-size:11px;color:var(--text3);margin-bottom:3px">${foundDocs.length}/${allDocs.length} dokumen</div>
+      <td style="text-align:center">
+        ${cntBerhasil > 0 ? `<span style="font-weight:600;color:var(--green)">${cntBerhasil}</span>` : '<span style="color:var(--border2)">—</span>'}
+      </td>
+      <td style="text-align:center">
+        ${cntProgress > 0 ? `<span style="font-weight:600;color:var(--blue)">${cntProgress}</span>` : '<span style="color:var(--border2)">—</span>'}
+      </td>
+      <td style="text-align:center">
+        ${cntGagal > 0 ? `<span style="font-weight:600;color:var(--red)">${cntGagal}</span>` : '<span style="color:var(--border2)">—</span>'}
+      </td>
+      <td style="min-width:80px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:3px">${foundDocs.length}/${allDocs.length}</div>
         <div style="height:4px;background:var(--bg3);border-radius:2px;overflow:hidden">
           <div style="height:100%;width:${pct}%;background:${barColor};border-radius:2px;transition:.3s"></div>
         </div>
@@ -1139,6 +1234,10 @@ function renderSettings() {
         <label class="form-lbl">Field Apply Status</label>
         <input class="form-inp" id="cfg-fld-status" value="${fld('Apply Status')}" placeholder="Apply Status">
       </div>
+      <div class="form-group">
+        <label class="form-lbl">Field Notes SSO</label>
+        <input class="form-inp" id="cfg-fld-notes" value="${fld('Notes SSO')}" placeholder="Notes SSO">
+      </div>
     </div>
   </div>
 
@@ -1172,6 +1271,7 @@ function saveSettings() {
   cfg['fld_Photo']   = document.getElementById('cfg-fld-photo').value.trim() || 'Photo';
   cfg['fld_Documents'] = document.getElementById('cfg-fld-docs').value.trim() || 'Documents';
   cfg['fld_Apply Status'] = document.getElementById('cfg-fld-status').value.trim() || 'Apply Status';
+  cfg['fld_Notes SSO']   = document.getElementById('cfg-fld-notes').value.trim() || 'Notes SSO';
   cfg.sheetsUrl  = document.getElementById('cfg-sheets-url').value.trim();
   cfg.changedBy  = document.getElementById('cfg-changed-by').value.trim();
   saveCfg();
